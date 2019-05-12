@@ -12,8 +12,8 @@ Table_t *new_Table(char *file_name) {
     memset((void*)table, 0, sizeof(Table_t));
     table->capacity = INIT_TABLE_SIZE;
     table->len = 0;
-    table->users = (User_t*)malloc(
-                            sizeof(User_t) * INIT_TABLE_SIZE);
+    //table->users = (User_t*)malloc(
+    //                        sizeof(User_t) * INIT_TABLE_SIZE);
     table->cache_map = (unsigned char*)malloc(sizeof(char)*INIT_TABLE_SIZE);
     memset(table->cache_map, 0, sizeof(char)*INIT_TABLE_SIZE);
     table->fp = NULL;
@@ -42,23 +42,24 @@ int add_User(Table_t *table, User_t *user) {
         }
     }
     if (table->len == table->capacity) {
-        User_t *new_user_buf = (User_t*)malloc(sizeof(User_t)*(table->len+EXT_LEN));
+        //User_t *new_user_buf = (User_t*)malloc(sizeof(User_t)*(table->len+EXT_LEN));
         unsigned char *new_cache_buf = (unsigned char *)malloc(sizeof(unsigned char)*(table->len+EXT_LEN));
 
-        memcpy(new_user_buf, table->users, sizeof(User_t)*table->len);
+        //memcpy(new_user_buf, table->users, sizeof(User_t)*table->len);
 
         memset(new_cache_buf, 0, sizeof(unsigned char)*(table->len+EXT_LEN));
         memcpy(new_cache_buf, table->cache_map, sizeof(unsigned char)*table->len);
 
 
-        free(table->users);
+        //free(table->users);
         free(table->cache_map);
-        table->users = new_user_buf;
+        //table->users = new_user_buf;
         table->cache_map = new_cache_buf;
         table->capacity += EXT_LEN;
     }
     idx = table->len;
-    memcpy((table->users)+idx, user, sizeof(User_t));
+    //memcpy((table->users)+idx, user, sizeof(User_t));
+    table->users.push_back(*user);
     table->cache_map[idx] = 1;
     table->len++;
     return 1;
@@ -79,7 +80,11 @@ int archive_table(Table_t *table) {
     } else {
         archived_len = 0;
     }
-    fwrite((void*)(table->users+archived_len), \
+    /*fwrite((void*)(table->users+archived_len), \
+            sizeof(User_t), table->len-archived_len, \
+            table->fp);*/
+    User_t* users = &table->users[0];
+    fwrite((void*)(users+archived_len), \
             sizeof(User_t), table->len-archived_len, \
             table->fp);
 
@@ -113,14 +118,14 @@ int load_table(Table_t *table, char *file_name) {
         } else {
             archived_len = st.st_size / sizeof(User_t);
             if (archived_len > table->capacity) {
-                User_t *new_user_buf = (User_t*)malloc(sizeof(User_t)*(archived_len+EXT_LEN));
+                //User_t *new_user_buf = (User_t*)malloc(sizeof(User_t)*(archived_len+EXT_LEN));
                 unsigned char *new_cache_buf = (unsigned char *)malloc(sizeof(unsigned char)*(archived_len+EXT_LEN));
 
                 memset(new_cache_buf, 0, sizeof(unsigned char)*(archived_len+EXT_LEN));
 
-                free(table->users);
+                //free(table->users);
                 free(table->cache_map);
-                table->users = new_user_buf;
+                //table->users = new_user_buf;
                 table->cache_map = new_cache_buf;
                 table->capacity = archived_len+EXT_LEN;
             }
@@ -152,10 +157,11 @@ User_t* get_User(Table_t *table, size_t idx) {
         }
 
         fseek(table->fp, idx*sizeof(User_t), SEEK_SET);
-        fread(table->users+idx, sizeof(User_t), 1, table->fp);
+        //fread(table->users+idx, sizeof(User_t), 1, table->fp);
         table->cache_map[idx] = 1;
     }
-    return table->users+idx;
+    //return table->users+idx;
+    return &table->users[idx];
 
 error:
     return NULL;
