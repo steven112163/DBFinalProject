@@ -69,14 +69,14 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
 
     if (idxList) {
         for (idx = offset; idx < idxListLen; idx++) {
-            if (limit != -1 && (idx - offset) >= limit) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
             print_user(get_User(table, idxList[idx]), &(cmd->cmd_args.sel_args));
         }
     } else {
         for (idx = offset; idx < table->len; idx++) {
-            if (limit != -1 && (idx - offset) >= limit) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
             print_user(get_User(table, idx), &(cmd->cmd_args.sel_args));
@@ -109,7 +109,7 @@ int parse_input(char *input, Command_t *cmd) {
 /// Return: command type
 ///
 void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
-    if (!strncmp(cmd->args[0], ".exit", 5)) {
+    /*if (!strncmp(cmd->args[0], ".exit", 5)) {
         archive_table(table);
         exit(0);
     } else if (!strncmp(cmd->args[0], ".output", 7)) {
@@ -133,6 +133,32 @@ void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
         }
     } else if (!strncmp(cmd->args[0], ".help", 5)) {
         print_help_msg();
+    }*/
+    if (cmd->args[0] == ".exit") {
+        archive_table(table);
+        exit(0);
+    } else if (cmd->args[0] == ".output") {
+        if (cmd->args_len == 2) {
+            if (cmd->args[1] == "stdout") {
+                close(1);
+                dup2(state->saved_stdout, 1);
+                state->saved_stdout = -1;
+            } else if (state->saved_stdout == -1) {
+                int fd = creat(cmd->args[1].c_str(), 0644);
+                state->saved_stdout = dup(1);
+                if (dup2(fd, 1) == -1) {
+                    state->saved_stdout = -1;
+                }
+                __fpurge(stdout); //This is used to clear the stdout buffer
+            }
+        }
+    } else if (cmd->args[0] == ".load") {
+        if (cmd->args_len == 2) {
+            char* filename = (char*) cmd->args[1].c_str();
+            load_table(table, filename);
+        }
+    } else if (cmd->args[0] == ".help") {
+        print_help_msg();
     }
 }
 
@@ -141,10 +167,10 @@ void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
 /// Return: command type
 ///
 int handle_query_cmd(Table_t *table, Command_t *cmd) {
-    if (!strncmp(cmd->args[0], "insert", 6)) {
+    if (cmd->args[0] == "insert") {
         handle_insert_cmd(table, cmd);
         return INSERT_CMD;
-    } else if (!strncmp(cmd->args[0], "select", 6)) {
+    } else if (cmd->args[0] == "select") {
         handle_select_cmd(table, cmd);
         return SELECT_CMD;
     } else {
@@ -178,6 +204,8 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = SELECT_CMD;
     field_state_handler(cmd, 1);
 
+    // add where
+    
     print_users(table, NULL, 0, cmd);
     return table->len;
 }

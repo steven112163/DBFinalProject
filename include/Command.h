@@ -1,6 +1,9 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <vector>
+#include <string>
+
 enum { 
     UNRECOG_CMD,
     BUILT_IN_CMD,
@@ -33,7 +36,8 @@ typedef union {
 
 typedef struct Command {
     unsigned char type;
-    char **args;
+    //char **args;
+    std::vector<std::string> args;
     size_t args_len;
     size_t args_cap;
     CmdArg_t cmd_args;

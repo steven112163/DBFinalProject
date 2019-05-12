@@ -17,7 +17,7 @@ Command_t* new_Command() {
     memset(cmd, 0, sizeof(Command_t));
 
     cmd->type = UNRECOG_CMD;
-    cmd->args = NULL;
+    //cmd->args = NULL;
     cmd->args_len = 0;
     cmd->args_cap = 0;
     return cmd;
@@ -28,7 +28,7 @@ Command_t* new_Command() {
 /// Reallocate buffer if it is full.
 ///
 int add_Arg(Command_t *cmd, const char *arg) {
-    char **new_buf;
+    /*char **new_buf;
     if (cmd->args == NULL) {
         new_buf = (char **) malloc(sizeof(char*) * 5);
         if (new_buf == NULL)
@@ -52,11 +52,18 @@ int add_Arg(Command_t *cmd, const char *arg) {
         cmd->args_cap += 5;
     }
     cmd->args[cmd->args_len] = strdup(arg);
+    cmd->args_len++;*/
+    std::string inputArg = arg;
+    if (cmd->args.size() == 0)
+        cmd->args_cap = 5;
+    else if (cmd->args_cap == cmd->args_len)
+        cmd->args_cap += 5;
+    cmd->args.push_back(inputArg);
     cmd->args_len++;
     return 0;
 
-error:
-    return 1;
+/*error:
+    return 1;*/
 }
 
 ///
@@ -85,10 +92,11 @@ int add_select_field(Command_t *cmd, const char *argument) {
 ///
 void cleanup_Command(Command_t *cmd) {
     size_t idx;
-    for (idx = 0; idx < cmd->args_cap; idx++) {
+    /*for (idx = 0; idx < cmd->args_cap; idx++) {
         free(cmd->args[idx]);
         cmd->args[idx] = NULL;
-    }
+    }*/
+    cmd->args.clear();
     if (cmd->type == SELECT_CMD) {
         for (idx = 0; idx < cmd->cmd_args.sel_args.fields_len; idx++) {
             free(cmd->cmd_args.sel_args.fields[idx]);

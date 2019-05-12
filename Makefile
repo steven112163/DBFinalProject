@@ -20,10 +20,10 @@ TEST_UTIL_INCLUE=$(wildcard $(TEST_SRC_DIR)/include/*.h)
 all: $(TARGET)
 
 %.o: %.c $(DEPS)
-	$(CC) -o $@ $< -c $(CFLAGS)
+	$(CXX) -o $@ $< -c $(CFLAGS)
 
 shell: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CXX) -o $@ $^ $(CFLAGS)
 
 check: $(TEST)
 	-$(TEST)
