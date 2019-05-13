@@ -143,6 +143,7 @@ int load_table(Table_t *table, char *file_name) {
 User_t* get_User(Table_t *table, size_t idx) {
     size_t archived_len;
     struct stat st;
+    return &table->users[idx];
     if (!table->cache_map[idx]) {
         if (idx > INIT_TABLE_SIZE) {
             goto error;
@@ -161,7 +162,6 @@ User_t* get_User(Table_t *table, size_t idx) {
         table->cache_map[idx] = 1;
     }
     //return table->users+idx;
-    return &table->users[idx];
 
 error:
     return NULL;

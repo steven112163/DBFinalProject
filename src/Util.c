@@ -9,6 +9,7 @@
 #include "Command.h"
 #include "Table.h"
 #include "SelectState.h"
+#include "DeleteState.h"
 
 ///
 /// Allocate State_t and initialize some attributes
@@ -227,7 +228,6 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
 int handle_update_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = UPDATE_CMD;
     
-    print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     return table->len;
 }
 
@@ -238,11 +238,9 @@ int handle_update_cmd(Table_t *table, Command_t *cmd) {
 ///
 int handle_delete_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = DELETE_CMD;
-    
-    // TODO
-    
-    print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
-    return table->len;
+    size_t originalTableLen = table->len;
+    field_delete_handler(cmd, 1, table);
+    return originalTableLen - table->len;
 }
 
 ///
