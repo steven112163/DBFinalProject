@@ -23,11 +23,19 @@ typedef struct {
 
 extern CMD_t cmd_list[];
 
+/*typedef struct SelectArgs {
+    char **fields;
+    size_t fields_len;
+    int offset;
+    int limit;
+} SelectArgs_t;*/
 typedef struct SelectArgs {
     char **fields;
     size_t fields_len;
     int offset;
     int limit;
+    std::vector<size_t> idxList;
+    size_t idxListLen;
 } SelectArgs_t;
 
 typedef union {

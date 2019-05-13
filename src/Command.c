@@ -97,6 +97,8 @@ void cleanup_Command(Command_t *cmd) {
         cmd->args[idx] = NULL;
     }*/
     cmd->args.clear();
+    cmd->cmd_args.sel_args.idxList.clear();
+    cmd->cmd_args.sel_args.idxListLen = 0;
     if (cmd->type == SELECT_CMD) {
         for (idx = 0; idx < cmd->cmd_args.sel_args.fields_len; idx++) {
             free(cmd->cmd_args.sel_args.fields[idx]);
@@ -109,4 +111,3 @@ void cleanup_Command(Command_t *cmd) {
     cmd->type = UNRECOG_CMD;
     cmd->args_len = 0;
 }
-

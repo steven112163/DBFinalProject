@@ -9,6 +9,7 @@
 #include "Command.h"
 #include "Table.h"
 #include "SelectState.h"
+#include <iostream>
 
 ///
 /// Allocate State_t and initialize some attributes
@@ -58,7 +59,8 @@ void print_user(User_t *user, SelectArgs_t *sel_args) {
 ///
 /// Print the users for given offset and limit restriction
 ///
-void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd) {
+//void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd) {
+void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
     size_t idx;
     int limit = cmd->cmd_args.sel_args.limit;
     int offset = cmd->cmd_args.sel_args.offset;
@@ -67,7 +69,10 @@ void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd
         offset = 0;
     }
 
-    if (idxList) {
+    //if (idxList) {
+    if (idxList.empty() && idxListLen == 1)
+        return;
+    else if (idxListLen != 0) {
         for (idx = offset; idx < idxListLen; idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
@@ -202,11 +207,10 @@ int handle_insert_cmd(Table_t *table, Command_t *cmd) {
 ///
 int handle_select_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = SELECT_CMD;
-    field_state_handler(cmd, 1);
-
-    // add where
+    field_state_handler(cmd, 1, table);
     
-    print_users(table, NULL, 0, cmd);
+    //print_users(table, NULL, 0, cmd);
+    print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     return table->len;
 }
 
