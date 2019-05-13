@@ -9,7 +9,6 @@
 #include "Command.h"
 #include "Table.h"
 #include "SelectState.h"
-#include <iostream>
 
 ///
 /// Allocate State_t and initialize some attributes
@@ -178,6 +177,12 @@ int handle_query_cmd(Table_t *table, Command_t *cmd) {
     } else if (cmd->args[0] == "select") {
         handle_select_cmd(table, cmd);
         return SELECT_CMD;
+    } else if (cmd->args[0] == "update") {
+        handle_update_cmd(table, cmd);
+        return UPDATE_CMD;
+    } else if (cmd->args[0] == "delete") {
+        handle_delete_cmd(table, cmd);
+        return DELETE_CMD;
     } else {
         return UNRECOG_CMD;
     }
@@ -210,6 +215,32 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
     field_state_handler(cmd, 1, table);
     
     //print_users(table, NULL, 0, cmd);
+    print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
+    return table->len;
+}
+
+///
+/// The return value is the number of rows updated from table
+/// If the update operation success, then change the input arg
+/// `cmd->type` to UPDATE_CMD
+///
+int handle_update_cmd(Table_t *table, Command_t *cmd) {
+    cmd->type = UPDATE_CMD;
+    
+    print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
+    return table->len;
+}
+
+///
+/// The return value is the number of rows deleted from table
+/// If the delete operation success, then change the input arg
+/// `cmd->type` to DELETE_CMD
+///
+int handle_delete_cmd(Table_t *table, Command_t *cmd) {
+    cmd->type = DELETE_CMD;
+    
+    // TODO
+    
     print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     return table->len;
 }
