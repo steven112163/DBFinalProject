@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "User.h"
-#include <vector>
 
 #define INIT_TABLE_SIZE 10000
 #define EXT_LEN 500
@@ -15,6 +14,9 @@ typedef struct Table {
     unsigned char *cache_map;
     FILE *fp;
     char *file_name;
+    std::vector<std::string> aggreTypes;
+    std::vector<std::string> aggreFields;
+    std::vector<std::string> aggreResults;
 } Table_t;
 
 Table_t *new_Table(char *file_name);

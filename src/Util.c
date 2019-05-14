@@ -66,12 +66,30 @@ void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
     int limit = cmd->cmd_args.sel_args.limit;
     int offset = cmd->cmd_args.sel_args.offset;
 
-    if (offset == -1) {
+    if (offset == -1)
         offset = 0;
-    }
+    
+    if (limit == -1 && table->aggreResults.size() > 0)
+        limit = 1;
 
-    //if (idxList) {
-    if (idxList.empty() && idxListLen == 1)
+    if (table->aggreResults.size() > 0) {
+        if (offset == 0 && limit > 0) {
+            printf("(");
+            size_t idx;
+            for (idx = 0; idx < table->aggreResults.size(); idx++) {
+                if (idx > 0) printf(", ");
+                
+                if (table->aggreTypes[idx] == "avg") {
+                    double output = atof(table->aggreResults[idx].c_str());
+                    printf("%.3f", output);
+                } else {
+                    int output = atoi(table->aggreResults[idx].c_str());
+                    printf("%d", output);
+                }
+            }
+            printf(")\n");
+        }
+    } else if (idxList.empty() && idxListLen == 1)
         return;
     else if (idxListLen != 0) {
         for (idx = offset; idx < idxListLen; idx++) {
