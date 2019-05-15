@@ -10,10 +10,13 @@
 typedef struct Table {
     size_t capacity;
     size_t len;
-    User_t *users;
+    std::vector<User_t> users;
     unsigned char *cache_map;
     FILE *fp;
     char *file_name;
+    std::vector<std::string> aggreTypes;
+    std::vector<std::string> aggreFields;
+    std::vector<std::string> aggreResults;
 } Table_t;
 
 Table_t *new_Table(char *file_name);

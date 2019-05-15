@@ -1,6 +1,9 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include <vector>
+#include <string>
+
 enum { 
     UNRECOG_CMD,
     BUILT_IN_CMD,
@@ -10,6 +13,8 @@ enum {
 enum {
     INSERT_CMD = 100,
     SELECT_CMD,
+    UPDATE_CMD,
+    DELETE_CMD,
 };
 
 typedef struct {
@@ -20,11 +25,19 @@ typedef struct {
 
 extern CMD_t cmd_list[];
 
+/*typedef struct SelectArgs {
+    char **fields;
+    size_t fields_len;
+    int offset;
+    int limit;
+} SelectArgs_t;*/
 typedef struct SelectArgs {
     char **fields;
     size_t fields_len;
     int offset;
     int limit;
+    std::vector<size_t> idxList;
+    size_t idxListLen;
 } SelectArgs_t;
 
 typedef union {
@@ -33,7 +46,8 @@ typedef union {
 
 typedef struct Command {
     unsigned char type;
-    char **args;
+    //char **args;
+    std::vector<std::string> args;
     size_t args_len;
     size_t args_cap;
     CmdArg_t cmd_args;

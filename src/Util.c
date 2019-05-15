@@ -9,6 +9,8 @@
 #include "Command.h"
 #include "Table.h"
 #include "SelectState.h"
+#include "DeleteState.h"
+#include "UpdateState.h"
 
 ///
 /// Allocate State_t and initialize some attributes
@@ -48,7 +50,7 @@ void print_user(User_t *user, SelectArgs_t *sel_args) {
             } else if (!strncmp(sel_args->fields[idx], "email", 5)) {
                 printf("%s", user->email);
             } else if (!strncmp(sel_args->fields[idx], "age", 3)) {
-                printf("%s", user->age);
+                printf("%d", user->age);
             }
         }
     }
@@ -58,25 +60,47 @@ void print_user(User_t *user, SelectArgs_t *sel_args) {
 ///
 /// Print the users for given offset and limit restriction
 ///
-void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd) {
+//void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd) {
+void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
     size_t idx;
     int limit = cmd->cmd_args.sel_args.limit;
     int offset = cmd->cmd_args.sel_args.offset;
 
-    if (offset == -1) {
+    if (offset == -1)
         offset = 0;
-    }
+    
+    if (limit == -1 && table->aggreResults.size() > 0)
+        limit = 1;
 
-    if (idxList) {
+    if (table->aggreResults.size() > 0) {
+        if (offset == 0 && limit > 0) {
+            printf("(");
+            size_t idx;
+            for (idx = 0; idx < table->aggreResults.size(); idx++) {
+                if (idx > 0) printf(", ");
+                
+                if (table->aggreTypes[idx] == "avg") {
+                    double output = atof(table->aggreResults[idx].c_str());
+                    printf("%.3f", output);
+                } else {
+                    int output = atoi(table->aggreResults[idx].c_str());
+                    printf("%d", output);
+                }
+            }
+            printf(")\n");
+        }
+    } else if (idxList.empty() && idxListLen == 1)
+        return;
+    else if (idxListLen != 0) {
         for (idx = offset; idx < idxListLen; idx++) {
-            if (limit != -1 && (idx - offset) >= limit) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
             print_user(get_User(table, idxList[idx]), &(cmd->cmd_args.sel_args));
         }
     } else {
         for (idx = offset; idx < table->len; idx++) {
-            if (limit != -1 && (idx - offset) >= limit) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
             print_user(get_User(table, idx), &(cmd->cmd_args.sel_args));
@@ -109,7 +133,7 @@ int parse_input(char *input, Command_t *cmd) {
 /// Return: command type
 ///
 void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
-    if (!strncmp(cmd->args[0], ".exit", 5)) {
+    /*if (!strncmp(cmd->args[0], ".exit", 5)) {
         archive_table(table);
         exit(0);
     } else if (!strncmp(cmd->args[0], ".output", 7)) {
@@ -133,6 +157,32 @@ void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
         }
     } else if (!strncmp(cmd->args[0], ".help", 5)) {
         print_help_msg();
+    }*/
+    if (cmd->args[0] == ".exit") {
+        archive_table(table);
+        exit(0);
+    } else if (cmd->args[0] == ".output") {
+        if (cmd->args_len == 2) {
+            if (cmd->args[1] == "stdout") {
+                close(1);
+                dup2(state->saved_stdout, 1);
+                state->saved_stdout = -1;
+            } else if (state->saved_stdout == -1) {
+                int fd = creat(cmd->args[1].c_str(), 0644);
+                state->saved_stdout = dup(1);
+                if (dup2(fd, 1) == -1) {
+                    state->saved_stdout = -1;
+                }
+                __fpurge(stdout); //This is used to clear the stdout buffer
+            }
+        }
+    } else if (cmd->args[0] == ".load") {
+        if (cmd->args_len == 2) {
+            char* filename = (char*) cmd->args[1].c_str();
+            load_table(table, filename);
+        }
+    } else if (cmd->args[0] == ".help") {
+        print_help_msg();
     }
 }
 
@@ -141,12 +191,18 @@ void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
 /// Return: command type
 ///
 int handle_query_cmd(Table_t *table, Command_t *cmd) {
-    if (!strncmp(cmd->args[0], "insert", 6)) {
+    if (cmd->args[0] == "insert") {
         handle_insert_cmd(table, cmd);
         return INSERT_CMD;
-    } else if (!strncmp(cmd->args[0], "select", 6)) {
+    } else if (cmd->args[0] == "select") {
         handle_select_cmd(table, cmd);
         return SELECT_CMD;
+    } else if (cmd->args[0] == "update") {
+        handle_update_cmd(table, cmd);
+        return UPDATE_CMD;
+    } else if (cmd->args[0] == "delete") {
+        handle_delete_cmd(table, cmd);
+        return DELETE_CMD;
     } else {
         return UNRECOG_CMD;
     }
@@ -176,10 +232,34 @@ int handle_insert_cmd(Table_t *table, Command_t *cmd) {
 ///
 int handle_select_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = SELECT_CMD;
-    field_state_handler(cmd, 1);
-
-    print_users(table, NULL, 0, cmd);
+    field_state_handler(cmd, 1, table);
+    
+    //print_users(table, NULL, 0, cmd);
+    print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     return table->len;
+}
+
+///
+/// The return value is the number of rows updated from table
+/// If the update operation success, then change the input arg
+/// `cmd->type` to UPDATE_CMD
+///
+int handle_update_cmd(Table_t *table, Command_t *cmd) {
+    cmd->type = UPDATE_CMD;
+    field_update_handler(cmd, 1, table);
+    return table->len;
+}
+
+///
+/// The return value is the number of rows deleted from table
+/// If the delete operation success, then change the input arg
+/// `cmd->type` to DELETE_CMD
+///
+int handle_delete_cmd(Table_t *table, Command_t *cmd) {
+    cmd->type = DELETE_CMD;
+    size_t originalTableLen = table->len;
+    field_delete_handler(cmd, 1, table);
+    return originalTableLen - table->len;
 }
 
 ///
