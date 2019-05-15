@@ -29,10 +29,17 @@ void set_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "set")) {
 
         arg_idx++;
-        size_t opLoc = cmd->args[arg_idx].find("=");
-        std::string field = cmd->args[arg_idx].substr(0, opLoc);
-        std::string data = cmd->args[arg_idx].substr(opLoc + 1, std::string::npos);
-        arg_idx++;
+        std::string setCondition = cmd->args[arg_idx];
+        size_t idx;
+        for (idx = arg_idx + 1; idx < cmd->args_len; idx++) {
+            if (cmd->args[idx] == "where") break;
+            setCondition += cmd->args[idx];
+        }
+        
+        size_t opLoc = setCondition.find("=");
+        std::string field = setCondition.substr(0, opLoc);
+        std::string data = setCondition.substr(opLoc + 1, std::string::npos);
+        arg_idx = idx;
         
         if (arg_idx == cmd->args_len) {
             if (field == "id")
@@ -48,10 +55,14 @@ void set_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                 size_t idx;
                 for (idx = 0; idx < table->len; idx++) {
                     User_t *user = get_User(table, idx);
-                    if (field == "name")
+                    if (field == "name") {
+                        memset(user->name, 0, MAX_USER_NAME+1);
                         strncpy(user->name, data.c_str(), MAX_USER_NAME);
-                    else
+                    }
+                    else {
+                        memset(user->email, 0, MAX_USER_EMAIL+1);
                         strncpy(user->email, data.c_str(), MAX_USER_EMAIL);
+                    }
                 }
             }
             
