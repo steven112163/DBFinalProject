@@ -60,7 +60,6 @@ void print_user(User_t *user, SelectArgs_t *sel_args) {
 ///
 /// Print the users for given offset and limit restriction
 ///
-//void print_users(Table_t *table, int *idxList, size_t idxListLen, Command_t *cmd) {
 void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
     size_t idx;
     int limit = cmd->cmd_args.sel_args.limit;
@@ -89,9 +88,9 @@ void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
             }
             printf(")\n");
         }
-    } else if (idxList.empty() && idxListLen == 1)
+    } else if (idxList.empty() && idxListLen == 1) {
         return;
-    else if (idxListLen != 0) {
+    } else if (idxListLen != 0) {
         for (idx = offset; idx < idxListLen; idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
@@ -133,31 +132,6 @@ int parse_input(char *input, Command_t *cmd) {
 /// Return: command type
 ///
 void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
-    /*if (!strncmp(cmd->args[0], ".exit", 5)) {
-        archive_table(table);
-        exit(0);
-    } else if (!strncmp(cmd->args[0], ".output", 7)) {
-        if (cmd->args_len == 2) {
-            if (!strncmp(cmd->args[1], "stdout", 6)) {
-                close(1);
-                dup2(state->saved_stdout, 1);
-                state->saved_stdout = -1;
-            } else if (state->saved_stdout == -1) {
-                int fd = creat(cmd->args[1], 0644);
-                state->saved_stdout = dup(1);
-                if (dup2(fd, 1) == -1) {
-                    state->saved_stdout = -1;
-                }
-                __fpurge(stdout); //This is used to clear the stdout buffer
-            }
-        }
-    } else if (!strncmp(cmd->args[0], ".load", 5)) {
-        if (cmd->args_len == 2) {
-            load_table(table, cmd->args[1]);
-        }
-    } else if (!strncmp(cmd->args[0], ".help", 5)) {
-        print_help_msg();
-    }*/
     if (cmd->args[0] == ".exit") {
         archive_table(table);
         exit(0);
@@ -234,7 +208,6 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = SELECT_CMD;
     field_state_handler(cmd, 1, table);
     
-    //print_users(table, NULL, 0, cmd);
     print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     return table->len;
 }

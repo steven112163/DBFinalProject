@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "SelectState.h"
-#include "WhereConditions.h"
 
 void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     cmd->cmd_args.sel_args.fields = NULL;
@@ -82,10 +81,10 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             where_state_handler(cmd, arg_idx+1, table);
             return;
         } else if (cmd->args[arg_idx] == "offset") {
-            offset_state_handler(cmd, arg_idx+1);
+            offset_state_handler(cmd, arg_idx+1, NULL, table);
             return;
         } else if (cmd->args[arg_idx] == "limit") {
-            limit_state_handler(cmd, arg_idx+1);
+            limit_state_handler(cmd, arg_idx+1, NULL, table);
             return;
         }
     }
@@ -134,10 +133,10 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             return;
         }
         if (next_arg < cmd->args_len && cmd->args[next_arg] == "offset") {
-            offset_state_handler(cmd, next_arg+1);
+            offset_state_handler(cmd, next_arg+1, &whereConditions, table);
             return;
         } else if (next_arg < cmd->args_len && cmd->args[next_arg] == "limit") {
-            limit_state_handler(cmd, next_arg+1);
+            limit_state_handler(cmd, next_arg+1, &whereConditions, table);
             return;
         }
             
@@ -169,17 +168,38 @@ void get_aggregation_result(std::vector<size_t> targetIdx, Table_t *table) {
     }
 }
 
-void offset_state_handler(Command_t *cmd, size_t arg_idx) {
+void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereConditions, Table_t *table) {
     if (arg_idx < cmd->args_len) {
         cmd->cmd_args.sel_args.offset = atoi(cmd->args[arg_idx].c_str());
 
         arg_idx++;
 
         if (arg_idx == cmd->args_len) {
+        	if (whereConditions != NULL) {
+        	    if (table->aggreTypes.size() > 0) {
+                    std::vector<size_t> targetIdx;
+                    size_t idx;
+                    for (idx = 0; idx < table->len; idx++) {
+                        User_t *user = get_User(table, idx);
+                        if (whereConditions->getResult(user))
+                            targetIdx.push_back(idx);
+                    }
+                    
+                    get_aggregation_result(targetIdx, table);
+                }
+            } else {
+                if (table->aggreTypes.size() > 0) {
+                    std::vector<size_t> targetIdx;
+                    size_t idx;
+                    for (idx = 0; idx < table->len; idx++)
+                        targetIdx.push_back(idx);
+                    get_aggregation_result(targetIdx, table);
+                }
+            }
             return;
         } else if (arg_idx < cmd->args_len && cmd->args[arg_idx] == "limit") {
 
-            limit_state_handler(cmd, arg_idx+1);
+            limit_state_handler(cmd, arg_idx+1, whereConditions, table);
             return;
         }
     }
@@ -187,13 +207,34 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx) {
     return;
 }
 
-void limit_state_handler(Command_t *cmd, size_t arg_idx) {
+void limit_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereConditions, Table_t *table) {
     if (arg_idx < cmd->args_len) {
         cmd->cmd_args.sel_args.limit = atoi(cmd->args[arg_idx].c_str());
 
         arg_idx++;
 
         if (arg_idx == cmd->args_len) {
+            if (whereConditions != NULL) {
+        	    if (table->aggreTypes.size() > 0) {
+                    std::vector<size_t> targetIdx;
+                    size_t idx;
+                    for (idx = 0; idx < table->len; idx++) {
+                        User_t *user = get_User(table, idx);
+                        if (whereConditions->getResult(user))
+                            targetIdx.push_back(idx);
+                    }
+                    
+                    get_aggregation_result(targetIdx, table);
+                }
+            } else {
+                if (table->aggreTypes.size() > 0) {
+                    std::vector<size_t> targetIdx;
+                    size_t idx;
+                    for (idx = 0; idx < table->len; idx++)
+                        targetIdx.push_back(idx);
+                    get_aggregation_result(targetIdx, table);
+                }
+            }
             return;
         }
     }

@@ -25,12 +25,6 @@ typedef struct {
 
 extern CMD_t cmd_list[];
 
-/*typedef struct SelectArgs {
-    char **fields;
-    size_t fields_len;
-    int offset;
-    int limit;
-} SelectArgs_t;*/
 typedef struct SelectArgs {
     char **fields;
     size_t fields_len;
@@ -46,7 +40,6 @@ typedef union {
 
 typedef struct Command {
     unsigned char type;
-    //char **args;
     std::vector<std::string> args;
     size_t args_len;
     size_t args_cap;
