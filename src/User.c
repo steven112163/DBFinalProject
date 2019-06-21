@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "User.h"
-#include "Command.h"
 
 ///
 /// Allocate new space for User_t
@@ -24,7 +23,7 @@ User_t* command_to_User(Command_t *cmd) {
     if (!user || !cmd) {
         return NULL;
     }
-    if (cmd->args_len != 5 && cmd->args_len != 7) {
+    if (cmd->args_len != 7) {
         return NULL;
     }
     

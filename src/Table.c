@@ -58,6 +58,35 @@ int add_User(Table_t *table, User_t *user) {
 }
 
 ///
+/// Add the `Like_t` data to the given table
+/// If the table is full, it will allocate new space to store more
+/// like data
+/// return 1 when the data successfully add to table
+///
+int add_Like(Table_t *table, Like_t *like) {
+    size_t idx;
+    if (!table || !like) {
+        return 0;
+    }
+    if (table->len == table->capacity) {
+        unsigned char *new_cache_buf = (unsigned char *)malloc(sizeof(unsigned char)*(table->len+EXT_LEN));
+
+        memset(new_cache_buf, 0, sizeof(unsigned char)*(table->len+EXT_LEN));
+        memcpy(new_cache_buf, table->cache_map, sizeof(unsigned char)*table->len);
+
+
+        free(table->cache_map);
+        table->cache_map = new_cache_buf;
+        table->capacity += EXT_LEN;
+    }
+    idx = table->len;
+    table->likes.push_back(*like);
+    table->cache_map[idx] = 1;
+    table->len++;
+    return 1;
+}
+
+///
 /// Return value is the archived table len
 ///
 int archive_table(Table_t *table) {
@@ -153,3 +182,32 @@ error:
     return NULL;
 }
 
+///
+/// Return the like in table by the given index
+///
+Like_t* get_Like(Table_t *table, size_t idx) {
+    size_t archived_len;
+    struct stat st;
+    return &table->likes[idx];
+    if (!table->cache_map[idx]) {
+        if (idx > INIT_TABLE_SIZE) {
+            goto error;
+        }
+        if (stat(table->file_name, &st) != 0) {
+            goto error;
+        }
+        archived_len = st.st_size / sizeof(User_t);
+        if (idx >= archived_len) {
+            //neither in file, nor in memory
+            goto error;
+        }
+
+        fseek(table->fp, idx*sizeof(User_t), SEEK_SET);
+        //fread(table->users+idx, sizeof(User_t), 1, table->fp);
+        table->cache_map[idx] = 1;
+    }
+    //return table->users+idx;
+
+error:
+    return NULL;
+}

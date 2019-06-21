@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "UpdateState.h"
 #include "WhereConditions.h"
-#include <vector>
 
 void field_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     cmd->cmd_args.sel_args.fields = NULL;
@@ -29,31 +28,29 @@ void set_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "set")) {
 
         arg_idx++;
-        std::string setCondition = cmd->args[arg_idx];
-        size_t idx;
-        for (idx = arg_idx + 1; idx < cmd->args_len; idx++) {
-            if (cmd->args[idx] == "where") break;
-            setCondition += cmd->args[idx];
+        std::vector<std::string> setCondition;
+        for (; arg_idx < cmd->args_len; arg_idx++) {
+            if (cmd->args[arg_idx] == "where") break;
+            setCondition.push_back(cmd->args[arg_idx]);
         }
         
-        size_t opLoc = setCondition.find("=");
-        std::string field = setCondition.substr(0, opLoc);
-        std::string data = setCondition.substr(opLoc + 1, std::string::npos);
-        arg_idx = idx;
+        std::string field = setCondition[0];
+        std::string data = setCondition[2];
         
         if (arg_idx == cmd->args_len) {
             if (field == "id")
                 return;
             else if (field == "age") {
                 unsigned int age = atoi(data.c_str());
-                size_t idx;
-                for (idx = 0; idx < table->len; idx++) {
+                size_t idx, len = table->users.size();;
+                for (idx = 0; idx < len; idx++) {
                     User_t *user = get_User(table, idx);
                     user->age = age;
                 }
             } else {
                 size_t idx;
-                for (idx = 0; idx < table->len; idx++) {
+                size_t len = table->users.size();
+                for (idx = 0; idx < len; idx++) {
                     User_t *user = get_User(table, idx);
                     if (field == "name") {
                         memset(user->name, 0, MAX_USER_NAME+1);
@@ -85,7 +82,8 @@ void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::s
         
         size_t idx;
         std::vector<size_t> updateIdx;
-        for (idx = 0; idx < table->len; idx++) {
+        size_t len = table->users.size();
+        for (idx = 0; idx < len; idx++) {
             User_t *user = get_User(table, idx);
             if (whereConditions.getResult(user))
                 updateIdx.push_back(idx);
@@ -96,7 +94,8 @@ void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::s
                 return;
             
             unsigned int id = atoi(data.c_str());
-            for (idx = 0; idx < table->len; idx++) {
+            size_t len = table->users.size();
+            for (idx = 0; idx < len; idx++) {
                 User_t *user = get_User(table, idx);
                 if (user->id == id)
                     return;
@@ -106,12 +105,14 @@ void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::s
             user->id = id;
         } else if (field == "age") {
             unsigned int age = atoi(data.c_str());
-            for (idx = 0; idx < updateIdx.size(); idx++) {
+            size_t len = updateIdx.size();
+            for (idx = 0; idx < len; idx++) {
                 User_t *user = get_User(table, updateIdx[idx]);
                 user->age = age;
             }
         } else {
-            for (idx = 0; idx < updateIdx.size(); idx++) {
+            size_t len = updateIdx.size();
+            for (idx = 0; idx < len; idx++) {
                 User_t *user = get_User(table, updateIdx[idx]);
                 if (field == "name")
                     strncpy(user->name, data.c_str(), MAX_USER_NAME);

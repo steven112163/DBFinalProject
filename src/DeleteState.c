@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "DeleteState.h"
 #include "WhereConditions.h"
-#include <vector>
 
 void field_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     cmd->cmd_args.sel_args.fields = NULL;
@@ -31,7 +30,7 @@ void table_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
             table->users.clear();
-            table->len = 0;
+            table->len = table->likes.size();
             return;
         } else if (cmd->args[arg_idx] == "where") {
             where_delete_handler(cmd, arg_idx+1, table);
@@ -50,7 +49,7 @@ void where_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         WhereConditions whereConditions(conditions);
         
         int idx;
-        for (idx = 0; (size_t)idx < table->len; idx++) {
+        for (idx = 0; (size_t)idx < table->users.size(); idx++) {
             User_t *user = get_User(table, idx);
             if (whereConditions.getResult(user)) {
                 table->users.erase(table->users.begin() + idx);
