@@ -12,6 +12,7 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     table->aggreTypes.clear();
     table->aggreFields.clear();
     table->aggreResults.clear();
+    table->joinTuples.clear();
     while(arg_idx < cmd->args_len) {
         std::string field;
         std::string type = check_aggregation(cmd->args[arg_idx], field);
@@ -27,6 +28,10 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         } else if (cmd->args[arg_idx] == "email") {
             add_select_field(cmd, cmd->args[arg_idx].c_str());
         } else if (cmd->args[arg_idx] == "age") {
+            add_select_field(cmd, cmd->args[arg_idx].c_str());
+        } else if (cmd->args[arg_idx] == "id1") {
+            add_select_field(cmd, cmd->args[arg_idx].c_str());
+        } else if (cmd->args[arg_idx] == "id2") {
             add_select_field(cmd, cmd->args[arg_idx].c_str());
         } else if (cmd->args[arg_idx] == "from") {
             table_state_handler(cmd, arg_idx+1, table);
@@ -71,8 +76,8 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         if (arg_idx == cmd->args_len) {
             if (table->aggreTypes.size() > 0) {
                 std::vector<size_t> targetIdx;
-                size_t idx;
-                for (idx = 0; idx < table->len; idx++)
+                size_t idx, len = table->users.size();
+                for (idx = 0; idx < len; idx++)
                     targetIdx.push_back(idx);
                 get_aggregation_result(targetIdx, table);
             }
@@ -107,8 +112,8 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         
         if (table->aggreTypes.size() > 0) {
             std::vector<size_t> targetIdx;
-            size_t idx;
-            for (idx = 0; idx < table->len; idx++) {
+            size_t idx, len = table->users.size();
+            for (idx = 0; idx < len; idx++) {
                 User_t *user = get_User(table, idx);
                 if (whereConditions.getResult(user))
                     targetIdx.push_back(idx);
@@ -116,8 +121,8 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             
             get_aggregation_result(targetIdx, table);
         } else {
-            size_t idx;
-            for (idx = 0; idx < table->len; idx++) {
+            size_t idx, len = table->users.size();
+            for (idx = 0; idx < len; idx++) {
                 User_t *user = get_User(table, idx);
                 if (whereConditions.getResult(user)) {
                     cmd->cmd_args.sel_args.idxList.push_back(idx);
@@ -174,23 +179,11 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *where
         arg_idx++;
 
         if (arg_idx == cmd->args_len) {
-        	if (whereConditions != NULL) {
-        	    if (table->aggreTypes.size() > 0) {
-                    std::vector<size_t> targetIdx;
-                    size_t idx;
-                    for (idx = 0; idx < table->len; idx++) {
-                        User_t *user = get_User(table, idx);
-                        if (whereConditions->getResult(user))
-                            targetIdx.push_back(idx);
-                    }
-                    
-                    get_aggregation_result(targetIdx, table);
-                }
-            } else {
+        	if (whereConditions == NULL) {
                 if (table->aggreTypes.size() > 0) {
                     std::vector<size_t> targetIdx;
-                    size_t idx;
-                    for (idx = 0; idx < table->len; idx++)
+                    size_t idx, len = table->users.size();
+                    for (idx = 0; idx < len; idx++)
                         targetIdx.push_back(idx);
                     get_aggregation_result(targetIdx, table);
                 }
@@ -213,23 +206,11 @@ void limit_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereC
         arg_idx++;
 
         if (arg_idx == cmd->args_len) {
-            if (whereConditions != NULL) {
-        	    if (table->aggreTypes.size() > 0) {
-                    std::vector<size_t> targetIdx;
-                    size_t idx;
-                    for (idx = 0; idx < table->len; idx++) {
-                        User_t *user = get_User(table, idx);
-                        if (whereConditions->getResult(user))
-                            targetIdx.push_back(idx);
-                    }
-                    
-                    get_aggregation_result(targetIdx, table);
-                }
-            } else {
+            if (whereConditions == NULL) {
                 if (table->aggreTypes.size() > 0) {
                     std::vector<size_t> targetIdx;
-                    size_t idx;
-                    for (idx = 0; idx < table->len; idx++)
+                    size_t idx, len = table->users.size();
+                    for (idx = 0; idx < len; idx++)
                         targetIdx.push_back(idx);
                     get_aggregation_result(targetIdx, table);
                 }

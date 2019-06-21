@@ -8,6 +8,11 @@
 #define INIT_TABLE_SIZE 10000
 #define EXT_LEN 500
 
+typedef struct Tuple {
+    unsigned long userIndex;
+    unsigned long likeIndex;
+} Tuple_t;
+
 typedef struct Table {
     size_t capacity;
     size_t len;
@@ -19,6 +24,7 @@ typedef struct Table {
     std::vector<std::string> aggreTypes;
     std::vector<std::string> aggreFields;
     std::vector<std::string> aggreResults;
+    std::vector<Tuple_t> joinTuples;
 } Table_t;
 
 Table_t *new_Table(char *file_name);
