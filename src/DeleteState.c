@@ -26,7 +26,7 @@ void field_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
 }
 
 void table_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "table")) {
+    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user")) {
 
         arg_idx++;
         if (arg_idx == cmd->args_len) {
@@ -44,23 +44,22 @@ void table_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
 
 void where_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     if (arg_idx < cmd->args_len) {
-        std::string conditions = cmd->args[arg_idx];
-        size_t next_idx;
-        for (next_idx = arg_idx + 1; next_idx < cmd->args_len; next_idx++)
-            conditions += cmd->args[next_idx];
+        std::vector<std::string> conditions;
+        for (; arg_idx < cmd->args_len; arg_idx++)
+            conditions.push_back(cmd->args[arg_idx]);
         WhereConditions whereConditions(conditions);
         
         int idx;
         for (idx = 0; (size_t)idx < table->len; idx++) {
             User_t *user = get_User(table, idx);
             if (whereConditions.getResult(user)) {
-                table->users.erase(table->users.begin()+idx);
+                table->users.erase(table->users.begin() + idx);
                 idx--;
                 table->len--;
             }
         }
         
-        if (next_idx == cmd->args_len) {
+        if (arg_idx == cmd->args_len) {
             return;
         } 
     }

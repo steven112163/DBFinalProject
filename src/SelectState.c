@@ -65,7 +65,7 @@ std::string check_aggregation(std::string aggregation, std::string& field) {
 }
 
 void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "table")) {
+    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user")) {
 
         arg_idx++;
         if (arg_idx == cmd->args_len) {
@@ -100,10 +100,9 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                 cmd->args[next_arg] == "limit")
                 break;
         
-        std::string conditions = cmd->args[arg_idx];
-        size_t next_idx;
-        for (next_idx = arg_idx + 1; next_idx < next_arg; next_idx++)
-            conditions += cmd->args[next_idx];
+        std::vector<std::string> conditions;
+        for (; arg_idx < next_arg; arg_idx++)
+            conditions.push_back(cmd->args[arg_idx]);
         WhereConditions whereConditions(conditions);
         
         if (table->aggreTypes.size() > 0) {

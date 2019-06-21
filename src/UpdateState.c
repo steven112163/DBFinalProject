@@ -12,7 +12,7 @@ void field_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     cmd->cmd_args.sel_args.idxList.clear();
     cmd->cmd_args.sel_args.idxListLen = 0;
     while(arg_idx < cmd->args_len) {
-        if (cmd->args[arg_idx] == "table") {
+        if (cmd->args[arg_idx] == "user") {
             set_update_handler(cmd, arg_idx+1, table);
             return;
         } else {
@@ -78,10 +78,9 @@ void set_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
 
 void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::string field, std::string data) {
     if (arg_idx < cmd->args_len) {
-        std::string conditions = cmd->args[arg_idx];
-        size_t next_idx;
-        for (next_idx = arg_idx + 1; next_idx < cmd->args_len; next_idx++)
-            conditions += cmd->args[next_idx];
+        std::vector<std::string> conditions;
+        for (; arg_idx < cmd->args_len; arg_idx++)
+            conditions.push_back(cmd->args[arg_idx]);
         WhereConditions whereConditions(conditions);
         
         size_t idx;
@@ -121,7 +120,7 @@ void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::s
             }
         }
         
-        if (next_idx == cmd->args_len) {
+        if (arg_idx == cmd->args_len) {
             return;
         } 
     }
