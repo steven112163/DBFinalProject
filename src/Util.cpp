@@ -166,14 +166,14 @@ void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
-            print_user(get_User(table, idxList[idx]), &(cmd->cmd_args.sel_args));
+            print_like(get_Like(table, idxList[idx]), &(cmd->cmd_args.sel_args));
         }
     } else {
         for (idx = offset; idx < table->users.size(); idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
-            print_user(get_User(table, idx), &(cmd->cmd_args.sel_args));
+            print_like(get_Like(table, idx), &(cmd->cmd_args.sel_args));
         }
     }
 }
@@ -288,7 +288,7 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
         print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     }
     else if (table->t1_type == 1) { 
-        
+        print_likes(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     }
     else if (table->t1_type == 2) {
 
