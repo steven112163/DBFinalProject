@@ -178,6 +178,13 @@ void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
 }
 
 ///
+/// Print the join for given offset and limit restriction
+///
+void print_joins(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
+    
+}
+
+///
 /// This function received an output argument
 /// Return: category of the command
 ///
@@ -289,7 +296,7 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
         print_likes(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     }
     else if (table->t1_type == 2) {
-
+        print_joins(table, cmd->cmd-args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     }
     return table->users.size();
 }

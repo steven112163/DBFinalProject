@@ -77,17 +77,16 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         table->t1_type = 1;
     }
     auto join_idx = 0;
-    for (size_t k = 0; k < cmd->args_len; ++k) {
+    for (size_t k = 0; k < cmd->args_len; k++) {
         if (cmd->args[k] == "join") {
             join_idx = k;
             table->t1_type = 2;
+            break;
         }
     }
 
     // Join detected! Make join tuples...
     if (join_idx > 0) {
-        table->joinTuples.clear();  // reset tuple vector
-
         auto on_idx = 0;
         for (size_t i = 0; i < cmd->args_len; i++) {
             if (cmd->args[i] == "on") {
@@ -105,8 +104,8 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             joined_field = 2;
 
         // Push tuples
-        for (size_t i = 0; i < table->users.size(); ++i) {
-            for (size_t j = 0; j < table->likes.size(); ++j) {
+        for (size_t i = 0; i < table->users.size(); i++) {
+            for (size_t j = 0; j < table->likes.size(); j++) {
                 if (table->users[i].id == table->likes[j].id1
                     && joined_field == 1) {
                     table->joinTuples.emplace_back(i, j);
@@ -117,11 +116,12 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                 }
             }
         }
+        arg_idx = on_idx + 4;
     }
 
 
     // TODO: Fix aggr, offset, limit after join
-    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user" || cmd->args[arg_idx] == "like")) {
+    if (arg_idx < cmd->args_len) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
             if (!table->aggreTypes.empty()) {
@@ -142,6 +142,8 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             limit_state_handler(cmd, arg_idx + 1, nullptr, table);
             return;
         }
+    } else {
+        // TODO: Command is finished
     }
     cmd->type = UNRECOG_CMD;
 }
