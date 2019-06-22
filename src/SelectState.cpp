@@ -71,9 +71,11 @@ std::string check_aggregation(const std::string &aggregation, std::string &field
 void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     // Join detection
     auto join_idx = 0;
-    for (join_idx = 0; join_idx < cmd->args_len; join_idx++) {
-        if (cmd->args[join_idx] == "join")
+    for (int i = 0; i < cmd->args_len; i++) {
+        if (cmd->args[i] == "join") {
+            join_idx = i;
             break;
+        }
     }
 
     // Join detected! Make join tuples...
@@ -81,9 +83,11 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         table->joinTuples.clear();  // reset tuple vector
 
         auto on_idx = 0;
-        for (on_idx = 0; on_idx < cmd->args_len; on_idx++) {
-            if (cmd->args[on_idx] == "on")
+        for (int i = 0; i < cmd->args_len; i++) {
+            if (cmd->args[i] == "on") {
+                join_idx = i;
                 break;
+            }
         }
 
         // There will only be: id = id1 or id = id2
