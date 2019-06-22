@@ -19,6 +19,7 @@ User_t* new_User() {
 /// Transform from the input cmd to the User_t
 ///
 User_t* command_to_User(Command_t *cmd) {
+    //printf("into user\n");
     User_t *user = new_User();
     if (!user || !cmd) {
         return NULL;

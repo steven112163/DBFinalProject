@@ -9,3 +9,15 @@ shell
 
 # For system test output
 test/system/output/*
+*.json
+*.exe
+*.json
+result.json
+result.json
+*.json
+*.bin
+*.xml
+*.ipch
+*.json
+*.iml
+shell.exe.stackdump

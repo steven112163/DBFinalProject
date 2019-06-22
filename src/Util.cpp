@@ -212,11 +212,22 @@ int handle_query_cmd(Table_t *table, Command_t *cmd) {
 int handle_insert_cmd(Table_t *table, Command_t *cmd) {
     int ret = 0;
     User_t *user = command_to_User(cmd);
+    //Like_t *like = command_to_Like(cmd);
+    Like_t *like;
     if (user) {
+        //printf("in user\n");
         ret = add_User(table, user);
         if (ret > 0) {
             cmd->type = INSERT_CMD;
         }
+    }
+    if (like) {
+        //printf("in like\n");
+        ret = add_Like(table, like);
+        if (ret > 0) {
+            cmd->type = INSERT_CMD;
+        }
+        //printf("like success\n");
     }
     return ret;
 }

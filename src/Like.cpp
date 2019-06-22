@@ -17,6 +17,7 @@ Like_t* new_Like() {
 /// Transform from the input cmd to the Like_t
 ///
 Like_t* command_to_Like(Command_t *cmd) {
+    //printf("into like\n");
     Like_t *like = new_Like();
     if (!like || !cmd) {
         return NULL;
@@ -24,7 +25,7 @@ Like_t* command_to_Like(Command_t *cmd) {
     if (cmd->args_len != 5) {
         return NULL;
     }
-    
+    printf("cmd->args_len = %d\n",cmd->args_len);
     if (cmd->args[2] == "like") {
         like->id1 = atoi(cmd->args[3].c_str());
         like->id2 = atoi(cmd->args[4].c_str());
