@@ -87,6 +87,8 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
 
     // Join detected! Make join tuples...
     if (join_idx > 0) {
+        table->joinTuples.clear();  // reset tuple vector
+
         auto on_idx = 0;
         for (size_t i = 0; i < cmd->args_len; i++) {
             if (cmd->args[i] == "on") {

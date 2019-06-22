@@ -16,7 +16,6 @@ InputBuffer_t* new_InputBuffer() {
 
 ///
 /// Read the input from stdin, then store into InputBuffer_t
-/// TODO: accept different input source
 ///
 void read_input(InputBuffer_t *input_buffer) {
     ssize_t bytes_read = getline(&(input_buffer->buffer), &(input_buffer->buffer_len), stdin);

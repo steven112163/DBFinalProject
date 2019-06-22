@@ -32,6 +32,6 @@ int main(int argc, char **argv) {
             printf("Unrecognized command '%s'.\n", input_buffer->buffer);
         }
         cleanup_Command(cmd);
-        clean_InputBuffer(input_buffer);
+        // clean_InputBuffer(input_buffer);
     }
 }

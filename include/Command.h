@@ -26,7 +26,7 @@ typedef struct {
 extern CMD_t cmd_list[];
 
 typedef struct SelectArgs {
-    char **fields;
+    std::vector<std::string> fields;
     size_t fields_len;
     int offset;
     int limit;

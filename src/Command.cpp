@@ -43,19 +43,8 @@ int add_Arg(Command_t *cmd, const char *arg) {
 /// Add select fields
 ///
 int add_select_field(Command_t *cmd, const char *argument) {
-    size_t fields_len = cmd->cmd_args.sel_args.fields_len;
-    char **buf = (char**)malloc(sizeof(char*) * (fields_len+1));
-    if (buf == nullptr) {
-        return 0;
-    }
 
-    if (cmd->cmd_args.sel_args.fields) {
-        memcpy(buf, cmd->cmd_args.sel_args.fields, sizeof(char*) * fields_len);
-        free(cmd->cmd_args.sel_args.fields);
-    }
-
-    cmd->cmd_args.sel_args.fields = buf;
-    cmd->cmd_args.sel_args.fields[fields_len] = strdup(argument);
+    cmd->cmd_args.sel_args.fields.emplace_back(argument);
     cmd->cmd_args.sel_args.fields_len++;
     return 1;
 }
@@ -68,15 +57,8 @@ void cleanup_Command(Command_t *cmd) {
     cmd->args.clear();
     cmd->cmd_args.sel_args.idxList.clear();
     cmd->cmd_args.sel_args.idxListLen = 0;
-    if (cmd->type == SELECT_CMD) {
-        for (idx = 0; idx < cmd->cmd_args.sel_args.fields_len; idx++) {
-            free(cmd->cmd_args.sel_args.fields[idx]);
-            cmd->cmd_args.sel_args.fields[idx] = nullptr;
-        }
-        free(cmd->cmd_args.sel_args.fields);
-        cmd->cmd_args.sel_args.fields = nullptr;
-        cmd->cmd_args.sel_args.fields_len = 0;
-    }
+    cmd->cmd_args.sel_args.fields.clear();
+    cmd->cmd_args.sel_args.fields_len = 0;
     cmd->type = UNRECOG_CMD;
     cmd->args_len = 0;
 }
