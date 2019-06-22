@@ -69,25 +69,33 @@ std::string check_aggregation(const std::string &aggregation, std::string &field
 }
 
 void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-//    // Join detection
-//    auto join_idx = 0;
-//    for (join_idx = 0; join_idx < cmd->args_len; join_idx++) {
-//        if (cmd->args[join_idx] == "join")
-//            break;
-//    }
-//    // Form join tuples
-//    if (join_idx > 0) {
-//        auto on_idx = 0;
-//        for (on_idx = 0; on_idx < cmd->args_len; on_idx++) {
-//            if (cmd->args[on_idx] == "on")
-//                break;
-//        }
-//
-//        // There will only be: id = id1 or id = id2
-//        // joined_field is the field flag of Table like.
-//        auto joined_field = 0;
-//        if (cmd->args[on_idx + 3] == "id1");
-//    }
+    // Join detection
+    auto join_idx = 0;
+    for (join_idx = 0; join_idx < cmd->args_len; join_idx++) {
+        if (cmd->args[join_idx] == "join")
+            break;
+    }
+
+    // Join detected! Make join tuples...
+    if (join_idx > 0) {
+        table->joinTuples.clear();  // reset tuple vector
+
+        auto on_idx = 0;
+        for (on_idx = 0; on_idx < cmd->args_len; on_idx++) {
+            if (cmd->args[on_idx] == "on")
+                break;
+        }
+
+        // There will only be: id = id1 or id = id2
+        // joined_field is the field flag of Table like.
+        auto joined_field = 0;
+        if (cmd->args[on_idx + 3] == "id1")
+            joined_field = 1;
+        else
+            joined_field = 2;
+
+
+    }
 
 
     // TODO: Fix aggr, where, offset, limit after join
