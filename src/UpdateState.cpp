@@ -4,7 +4,7 @@
 #include "WhereConditions.h"
 
 void field_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    cmd->cmd_args.sel_args.fields = nullptr;
+    cmd->cmd_args.sel_args.fields.clear();
     cmd->cmd_args.sel_args.fields_len = 0;
     cmd->cmd_args.sel_args.limit = -1;
     cmd->cmd_args.sel_args.offset = -1;

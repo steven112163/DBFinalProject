@@ -38,18 +38,18 @@ void print_user(User_t *user, SelectArgs_t *sel_args) {
     size_t idx;
     printf("(");
     for (idx = 0; idx < sel_args->fields_len; idx++) {
-        if (!strncmp(sel_args->fields[idx], "*", 1)) {
+        if (sel_args->fields[idx] == "*") {
             printf("%d, %s, %s, %d", user->id, user->name, user->email, user->age);
         } else {
             if (idx > 0) printf(", ");
 
-            if (!strncmp(sel_args->fields[idx], "id", 2)) {
+            if (sel_args->fields[idx] == "id") {
                 printf("%d", user->id);
-            } else if (!strncmp(sel_args->fields[idx], "name", 4)) {
+            } else if (sel_args->fields[idx] == "name") {
                 printf("%s", user->name);
-            } else if (!strncmp(sel_args->fields[idx], "email", 5)) {
+            } else if (sel_args->fields[idx] == "email") {
                 printf("%s", user->email);
-            } else if (!strncmp(sel_args->fields[idx], "age", 3)) {
+            } else if (sel_args->fields[idx] == "age") {
                 printf("%d", user->age);
             }
         }
@@ -64,14 +64,14 @@ void print_like(Like_t *like, SelectArgs_t *sel_args) {
     size_t idx;
     printf("(");
     for (idx = 0; idx < sel_args->fields_len; idx++) {
-        if (!strncmp(sel_args->fields[idx], "*", 1)) {
+        if (sel_args->fields[idx] == "*") {
             printf("%d, %d", like->id1, like->id2);
         } else {
             if (idx > 0) printf(", ");
 
-            if (!strncmp(sel_args->fields[idx], "id1", 3)) {
+            if (sel_args->fields[idx] == "id1") {
                 printf("%d", like->id1);
-            } else if (!strncmp(sel_args->fields[idx], "id2", 3)) {
+            } else if (sel_args->fields[idx] == "id2") {
                 printf("%d", like->id2);
             }
         }
@@ -86,22 +86,22 @@ void print_join(User_t *user, Like_t *like, SelectArgs_t *sel_args) {
     size_t idx;
     printf("(");
     for (idx = 0; idx < sel_args->fields_len; idx++) {
-        if (!strncmp(sel_args->fields[idx], "*", 1)) {
+        if (sel_args->fields[idx] == "*") {
             printf("%d, %s, %s, %d, %d, %d", user->id, user->name, user->email, user->age, like->id1, like->id2);
         } else {
             if (idx > 0) printf(", ");
 
-            if (!strncmp(sel_args->fields[idx], "id", 2)) {
+            if (sel_args->fields[idx] == "id") {
                 printf("%d", user->id);
-            } else if (!strncmp(sel_args->fields[idx], "name", 4)) {
+            } else if (sel_args->fields[idx] == "name") {
                 printf("%s", user->name);
-            } else if (!strncmp(sel_args->fields[idx], "email", 5)) {
+            } else if (sel_args->fields[idx] == "email") {
                 printf("%s", user->email);
-            } else if (!strncmp(sel_args->fields[idx], "age", 3)) {
+            } else if (sel_args->fields[idx] == "age") {
                 printf("%d", user->age);
-            } else if (!strncmp(sel_args->fields[idx], "id1", 3)) {
+            } else if (sel_args->fields[idx] == "id1") {
                 printf("%d", like->id1);
-            } else if (!strncmp(sel_args->fields[idx], "id2", 3)) {
+            } else if (sel_args->fields[idx] == "id2") {
                 printf("%d", like->id2);
             }
         }
