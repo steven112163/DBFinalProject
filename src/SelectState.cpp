@@ -85,21 +85,13 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     }
 
     // Join detected! Make join tuples...
-    if (join_idx > 0) {
+    if (table->t1_type == 2) {
         table->joinTuples.clear();  // reset tuple vector
-
-        auto on_idx = 0;
-        for (int i = 0; i < cmd->args_len; i++) {
-            if (cmd->args[i] == "on") {
-                on_idx = i;
-                break;
-            }
-        }
 
         // There will only be: id = id1 or id = id2
         // joined_field is the field flag of Table like.
         auto joined_field = 0;
-        if (cmd->args[on_idx + 3] == "id1")
+        if (cmd->args[table1_idx + 6] == "id1")
             joined_field = 1;
         else
             joined_field = 2;
@@ -109,11 +101,11 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             for (int j = 0; j < table->likes.size(); ++j) {
                 if (table->users[i].id == table->likes[j].id1
                     && joined_field == 1) {
-
+                    table->joinTuples.emplace_back(i, j);
                 }
                 if (table->users[i].id == table->likes[j].id2
                     && joined_field == 2) {
-
+                    table->joinTuples.emplace_back(i, j);
                 }
             }
         }
