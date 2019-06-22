@@ -121,7 +121,7 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
 
 
     // TODO: Fix aggr, offset, limit after join
-    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user")) {
+    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user" || cmd->args[arg_idx] == "like")) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
             if (!table->aggreTypes.empty()) {
