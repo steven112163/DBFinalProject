@@ -17,7 +17,6 @@ Like_t* new_Like() {
 /// Transform from the input cmd to the Like_t
 ///
 Like_t* command_to_Like(Command_t *cmd) {
-    //printf("into like\n");
     Like_t *like = new_Like();
     if (!like || !cmd) {
         return NULL;
