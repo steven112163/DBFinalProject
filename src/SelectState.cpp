@@ -16,7 +16,7 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     while(arg_idx < cmd->args_len) {
         std::string field;
         std::string type = check_aggregation(cmd->args[arg_idx], field);
-        if (type != "") {
+        if (!type.empty()) {
             table->aggreTypes.push_back(type);
             table->aggreFields.push_back(field);
         } else if (cmd->args[arg_idx] == "*") {
@@ -43,7 +43,6 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         arg_idx += 1;
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
 std::string check_aggregation(std::string aggregation, std::string& field) {
@@ -74,7 +73,7 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
 
         arg_idx++;
         if (arg_idx == cmd->args_len) {
-            if (table->aggreTypes.size() > 0) {
+            if (!table->aggreTypes.empty()) {
                 std::vector<size_t> targetIdx;
                 size_t idx, len = table->users.size();
                 for (idx = 0; idx < len; idx++)
@@ -86,15 +85,14 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             where_state_handler(cmd, arg_idx+1, table);
             return;
         } else if (cmd->args[arg_idx] == "offset") {
-            offset_state_handler(cmd, arg_idx+1, NULL, table);
+            offset_state_handler(cmd, arg_idx + 1, nullptr, table);
             return;
         } else if (cmd->args[arg_idx] == "limit") {
-            limit_state_handler(cmd, arg_idx+1, NULL, table);
+            limit_state_handler(cmd, arg_idx + 1, nullptr, table);
             return;
         }
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
 void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
@@ -109,8 +107,8 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         for (; arg_idx < next_arg; arg_idx++)
             conditions.push_back(cmd->args[arg_idx]);
         WhereConditions whereConditions(conditions);
-        
-        if (table->aggreTypes.size() > 0) {
+
+        if (!table->aggreTypes.empty()) {
             std::vector<size_t> targetIdx;
             size_t idx, len = table->users.size();
             for (idx = 0; idx < len; idx++) {
@@ -146,7 +144,6 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
 void get_aggregation_result(std::vector<size_t> targetIdx, Table_t *table) {
@@ -179,8 +176,8 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *where
         arg_idx++;
 
         if (arg_idx == cmd->args_len) {
-        	if (whereConditions == NULL) {
-                if (table->aggreTypes.size() > 0) {
+            if (whereConditions == nullptr) {
+                if (!table->aggreTypes.empty()) {
                     std::vector<size_t> targetIdx;
                     size_t idx, len = table->users.size();
                     for (idx = 0; idx < len; idx++)
@@ -196,7 +193,6 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *where
         }
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
 void limit_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereConditions, Table_t *table) {
@@ -206,8 +202,8 @@ void limit_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereC
         arg_idx++;
 
         if (arg_idx == cmd->args_len) {
-            if (whereConditions == NULL) {
-                if (table->aggreTypes.size() > 0) {
+            if (whereConditions == nullptr) {
+                if (!table->aggreTypes.empty()) {
                     std::vector<size_t> targetIdx;
                     size_t idx, len = table->users.size();
                     for (idx = 0; idx < len; idx++)
@@ -219,5 +215,4 @@ void limit_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereC
         }
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }

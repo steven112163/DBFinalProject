@@ -4,9 +4,9 @@ TARGET=shell
 DEPS=$(wildcard *.h)
 
 SRC_DIR=src
-SRC=$(wildcard $(SRC_DIR)/*.c)
-OBJ=$(patsubst $(SRC_DIR)/%.c, $(SRC_DIR)/%.o, $(SRC))
-DEP_SRC=$(filter-out src/$(TARGET).c, $(SRC))
+SRC=$(wildcard $(SRC_DIR)/*.cpp)
+OBJ=$(patsubst $(SRC_DIR)/%.cpp, $(SRC_DIR)/%.o, $(SRC))
+DEP_SRC=$(filter-out src/$(TARGET).cpp, $(SRC))
 DEP_OBJ=$(filter-out src/$(TARGET).o, $(OBJ))
 
 CXX=g++
@@ -19,7 +19,7 @@ TEST_UTIL_INCLUE=$(wildcard $(TEST_SRC_DIR)/include/*.h)
 
 all: $(TARGET)
 
-%.o: %.c $(DEPS)
+%.o: %.cpp $(DEPS)
 	$(CXX) -o $@ $< -c $(CFLAGS)
 
 shell: $(OBJ)
