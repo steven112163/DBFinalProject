@@ -241,7 +241,6 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
     else if (table->t1_type == 1) {
 
     }
-
     else if (table->t1_type == 2) {
 
     }

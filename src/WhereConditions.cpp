@@ -20,6 +20,7 @@ WhereConditions::WhereConditions(std::vector<std::string> conditions) {
     }
 }
 
+// for user
 bool WhereConditions::getResult(User_t *user) {
     bool firstResult;
     if (this->firstField == "id" || this->firstField == "age") {
@@ -46,11 +47,43 @@ bool WhereConditions::getResult(User_t *user) {
         return (firstResult && secondResult);
 }
 
+// for like
+bool WhereConditions::getResult(Like_t *like) {
+    bool firstResult;
+    if (this->firstField == "id1" || this->firstField == "id2") {
+        double data = stod(this->firstData);
+        firstResult = this->getPartialResult(like, this->firstField, data, this->firstOp);
+    } 
+
+    if (this->secondField.empty())
+        return firstResult;
+    
+    bool secondResult;
+    if (this->secondField == "id1" || this->secondField == "id2") {
+        double data = stod(this->secondData);
+        secondResult = this->getPartialResult(like, this->secondField, data, this->secondOp);
+    } 
+    
+    if (this->op == "or")
+        return (firstResult || secondResult);
+    else
+        return (firstResult && secondResult);
+}
+
+// for user
 bool WhereConditions::getPartialResult(User_t *user, const std::string &field, double data, std::string op) {
     if (field == "id")
         return this->compare(user->id, data, op);
     else
         return this->compare(user->age, data, op);
+}
+
+// for like
+bool WhereConditions::getPartialResult(Like_t *like, const std::string &field, double data, std::string op) {
+    if (field == "id1")
+        return this->compare(like->id1, data, op);
+    else
+        return this->compare(like->id2, data, op);
 }
 
 bool WhereConditions::compare(unsigned int target, double data, std::string op) {

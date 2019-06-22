@@ -2,6 +2,7 @@
 #define WHERE_CONDITIONS_H
 
 #include "User.h"
+#include "Like.h"
 
 class WhereConditions {
 private:
@@ -14,6 +15,7 @@ private:
     std::string op;
 
     bool getPartialResult(User_t *user, const std::string &field, double data, std::string op);
+    bool getPartialResult(Like_t *like, const std::string &field, double data, std::string op);
 
     static bool compare(unsigned int target, double data, std::string op);
     bool getPartialResult(User_t *user, std::string field, std::string data, std::string op);
@@ -23,6 +25,7 @@ private:
 public:
     WhereConditions(std::vector<std::string> conditions);
     bool getResult(User_t *user);
+    bool getResult(Like_t *like);
 };
 
 #endif
