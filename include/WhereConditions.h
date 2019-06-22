@@ -15,16 +15,17 @@ private:
     std::string op;
 
 
-    bool getPartialResult(User_t *user, const std::string &field, double data, std::string op);
-    bool getPartialResult(Like_t *like, const std::string &field, double data, std::string op);
+    static bool getPartialResult(User_t *user, const std::string &field, double data, const std::string &op);
 
-    static bool getPartialResult(User_t *user, const std::string &field, double data, std::string op);
+    static bool getPartialResult(Like_t *like, const std::string &field, double data, const std::string &op);
 
 
-    static bool compare(unsigned int target, double data, std::string op);
-    bool getPartialResult(User_t *user, std::string field, std::string data, std::string op);
+    static bool compare(unsigned int target, double data, const std::string &op);
 
-    static bool compare(std::string target, std::string data, std::string op);
+    static bool
+    getPartialResult(User_t *user, const std::string &field, const std::string &data, const std::string &op);
+
+    static bool compare(const std::string &target, const std::string &data, const std::string &op);
 
 public:
     explicit WhereConditions(std::vector<std::string> conditions);
