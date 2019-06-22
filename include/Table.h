@@ -30,6 +30,7 @@ typedef struct Table {
     std::vector<std::string> aggreFields;
     std::vector<std::string> aggreResults;
     std::vector<Tuple> joinTuples;
+    int t1_type;     // 0:user, 1:like, 2:join
 } Table_t;
 
 Table_t *new_Table(char *file_name);

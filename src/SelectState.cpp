@@ -69,12 +69,18 @@ std::string check_aggregation(const std::string &aggregation, std::string &field
 }
 
 void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    // Join detection
+    auto table1_idx = arg_idx;
+    if (cmd->args[table1_idx] == "user") {
+        table->t1_type = 0;
+    }
+    if (cmd->args[table1_idx] == "like") {
+        table->t1_type = 1;
+    }
     auto join_idx = 0;
-    for (int i = 0; i < cmd->args_len; i++) {
-        if (cmd->args[i] == "join") {
-            join_idx = i;
-            break;
+    for (int k = 0; k < cmd->args_len; ++k) {
+        if (cmd->args[k] == "join") {
+            join_idx = k;
+            table->t1_type = 2;
         }
     }
 
@@ -85,7 +91,7 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         auto on_idx = 0;
         for (int i = 0; i < cmd->args_len; i++) {
             if (cmd->args[i] == "on") {
-                join_idx = i;
+                on_idx = i;
                 break;
             }
         }
@@ -98,7 +104,19 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         else
             joined_field = 2;
 
+        // Push tuples
+        for (int i = 0; i < table->users.size(); ++i) {
+            for (int j = 0; j < table->likes.size(); ++j) {
+                if (table->users[i].id == table->likes[j].id1
+                    && joined_field == 1) {
 
+                }
+                if (table->users[i].id == table->likes[j].id2
+                    && joined_field == 2) {
+
+                }
+            }
+        }
     }
 
 
