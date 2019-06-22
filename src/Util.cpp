@@ -17,7 +17,7 @@
 /// Return: ptr of new State_t
 ///
 State_t* new_State() {
-    State_t *state = (State_t*)malloc(sizeof(State_t));
+    auto *state = (State_t *) malloc(sizeof(State_t));
     state->saved_stdout = -1;
     return state;
 }
@@ -89,22 +89,21 @@ void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
 
     if (offset == -1)
         offset = 0;
-    
-    if (limit == -1 && table->aggreResults.size() > 0)
+
+    if (limit == -1 && !table->aggreResults.empty())
         limit = 1;
 
-    if (table->aggreResults.size() > 0) {
+    if (!table->aggreResults.empty()) {
         if (offset == 0 && limit > 0) {
             printf("(");
-            size_t idx;
-            for (idx = 0; idx < table->aggreResults.size(); idx++) {
-                if (idx > 0) printf(", ");
-                
-                if (table->aggreTypes[idx] == "avg") {
-                    double output = atof(table->aggreResults[idx].c_str());
+            for (size_t i = 0; i < table->aggreResults.size(); i++) {
+                if (i > 0) printf(", ");
+
+                if (table->aggreTypes[i] == "avg") {
+                    double output = atof(table->aggreResults[i].c_str());
                     printf("%.3f", output);
                 } else {
-                    int output = atoi(table->aggreResults[idx].c_str());
+                    int output = atoi(table->aggreResults[i].c_str());
                     printf("%d", output);
                 }
             }
@@ -192,9 +191,9 @@ int parse_input(char *input, Command_t *cmd) {
             cmd->type = cmd_list[idx].type;
         }
     }
-    while (token != NULL) {
+    while (token != nullptr) {
         add_Arg(cmd, token);
-        token = strtok(NULL, " ,\n");
+        token = strtok(nullptr, " ,\n");
     }
     return cmd->type;
 }

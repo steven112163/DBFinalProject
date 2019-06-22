@@ -7,7 +7,7 @@
 /// The caller should free the allocated space
 ///
 Like_t* new_Like() {
-    Like_t *new_like = (Like_t*)malloc(sizeof(Like_t));
+    auto *new_like = (Like_t *) malloc(sizeof(Like_t));
     new_like->id1 = 0;
     new_like->id2 = 0;
     return new_like;
@@ -19,16 +19,16 @@ Like_t* new_Like() {
 Like_t* command_to_Like(Command_t *cmd) {
     Like_t *like = new_Like();
     if (!like || !cmd) {
-        return NULL;
+        return nullptr;
     }
     if (cmd->args_len != 5) {
-        return NULL;
+        return nullptr;
     }
     if (cmd->args[2] == "like") {
-        like->id1 = atoi(cmd->args[3].c_str());
-        like->id2 = atoi(cmd->args[4].c_str());
+        like->id1 = std::stoi(cmd->args[3]);
+        like->id2 = std::stoi(cmd->args[4]);
     } else {
-        return NULL;
+        return nullptr;
     }
     
     return like;
