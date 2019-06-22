@@ -77,7 +77,7 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         table->t1_type = 1;
     }
     auto join_idx = 0;
-    for (int k = 0; k < cmd->args_len; ++k) {
+    for (size_t k = 0; k < cmd->args_len; ++k) {
         if (cmd->args[k] == "join") {
             join_idx = k;
             table->t1_type = 2;
@@ -89,7 +89,7 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         table->joinTuples.clear();  // reset tuple vector
 
         auto on_idx = 0;
-        for (int i = 0; i < cmd->args_len; i++) {
+        for (size_t i = 0; i < cmd->args_len; i++) {
             if (cmd->args[i] == "on") {
                 on_idx = i;
                 break;
@@ -105,22 +105,20 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             joined_field = 2;
 
         // Push tuples
-        for (int i = 0; i < table->users.size(); ++i) {
-            for (int j = 0; j < table->likes.size(); ++j) {
+        for (size_t i = 0; i < table->users.size(); ++i) {
+            for (size_t j = 0; j < table->likes.size(); ++j) {
                 if (table->users[i].id == table->likes[j].id1
                     && joined_field == 1) {
-
+                    table->joinTuples.emplace_back(i, j);
                 }
                 if (table->users[i].id == table->likes[j].id2
                     && joined_field == 2) {
-
+                    table->joinTuples.emplace_back(i, j);
                 }
             }
         }
     }
 
-
-    // TODO: Fix aggr, offset, limit after join
     if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user")) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
@@ -179,7 +177,11 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                 }
             }
             else {
-                // TODO: tuple
+                for (idx = 0; idx < table->joinTuples.size(); idx++) {
+                    Tuple tuple = table->joinTuples[idx];
+                    if (whereConditions.getResult(tuple, *table))
+                        targetIdx.push_back(idx);
+                }
             }
 
             get_aggregation_result(targetIdx, table);
@@ -206,7 +208,13 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                 }
             }
             else {
-                // TODO: tuple
+                for (idx = 0; idx < table->joinTuples.size(); idx++) {
+                    Tuple tuple = table->joinTuples[idx];
+                    if (whereConditions.getResult(tuple, *table)) {
+                        cmd->cmd_args.sel_args.idxList.push_back(idx);
+                        cmd->cmd_args.sel_args.idxListLen++;
+                    }
+                }
             }
             if (cmd->cmd_args.sel_args.idxListLen == 0)
                 cmd->cmd_args.sel_args.idxListLen = 1;
@@ -251,7 +259,19 @@ void get_aggregation_result(std::vector<size_t> targetIdx, Table_t *table) {
                         sum += like->id2;
                 }
                 else if (table->t1_type == 2) {
-                    // TODO: tuple
+                    auto user_idx = table->joinTuples[targetIdx[idx]].userIndex;
+                    auto like_idx = table->joinTuples[targetIdx[idx]].likeIndex;
+
+                    User_t *user = get_User(table, user_idx);
+                    Like_t *like = get_Like(table, like_idx);
+                    if (table->aggreFields[aggreIdx] == "id")
+                        sum += user->id;
+                    else if (table->aggreFields[aggreIdx] == "age")
+                        sum += user->age;
+                    else if (table->aggreFields[aggreIdx] == "id1")
+                        sum += like->id1;
+                    else if (table->aggreFields[aggreIdx] == "id2")
+                        sum += like->id2;
                 }
             }
             if (table->aggreTypes[aggreIdx] == "sum")
@@ -277,8 +297,8 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *where
                         len = table->users.size();
                     else if (table->t1_type == 1)
                         len = table->likes.size();
-                    else if (table->t1_type == 2) {
-                        // TODO: tuple
+                    else {
+                        len = table->joinTuples.size();
                     }
 
                     for (idx = 0; idx < len; idx++)
