@@ -235,7 +235,16 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = SELECT_CMD;
     field_state_handler(cmd, 1, table);
     
-    print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
+    if (table->t1_type == 0) {
+        print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
+    }
+    else if (table->t1_type == 1) {
+
+    }
+
+    else if (table->t1_type == 2) {
+
+    }
     return table->users.size();
 }
 
