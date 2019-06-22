@@ -10,14 +10,14 @@ int main(int argc, char **argv) {
     InputBuffer_t *input_buffer = new_InputBuffer();
     Command_t *cmd = new_Command();
     State_t *state = new_State();
-    Table_t *table = NULL;
+    Table_t *table = nullptr;
     int cmd_type;
     if (argc != 2) {
-        table = new_Table(NULL);
+        table = new_Table(nullptr);
     } else {
         table = new_Table(argv[1]);
     }
-    if (table == NULL) {
+    if (table == nullptr) {
         return 1;
     }
     for (;;) {
@@ -34,5 +34,4 @@ int main(int argc, char **argv) {
         cleanup_Command(cmd);
         clean_InputBuffer(input_buffer);
     }
-    return 0;
 }

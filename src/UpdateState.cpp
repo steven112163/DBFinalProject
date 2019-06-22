@@ -4,7 +4,7 @@
 #include "WhereConditions.h"
 
 void field_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    cmd->cmd_args.sel_args.fields = NULL;
+    cmd->cmd_args.sel_args.fields = nullptr;
     cmd->cmd_args.sel_args.fields_len = 0;
     cmd->cmd_args.sel_args.limit = -1;
     cmd->cmd_args.sel_args.offset = -1;
@@ -18,10 +18,8 @@ void field_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             cmd->type = UNRECOG_CMD;
             return;
         }
-        arg_idx += 1;
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
 void set_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
@@ -41,8 +39,8 @@ void set_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             if (field == "id")
                 return;
             else if (field == "age") {
-                unsigned int age = atoi(data.c_str());
-                size_t idx, len = table->users.size();;
+                unsigned int age = std::stoi(data);
+                size_t idx, len = table->users.size();
                 for (idx = 0; idx < len; idx++) {
                     User_t *user = get_User(table, idx);
                     user->age = age;
@@ -70,10 +68,10 @@ void set_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         }
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
-void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::string field, std::string data) {
+void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, const std::string &field,
+                          const std::string &data) {
     if (arg_idx < cmd->args_len) {
         std::vector<std::string> conditions;
         for (; arg_idx < cmd->args_len; arg_idx++)
@@ -92,8 +90,8 @@ void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::s
         if (field == "id") {
             if (updateIdx.size() > 1)
                 return;
-            
-            unsigned int id = atoi(data.c_str());
+
+            unsigned int id = std::stoi(data);
             size_t len = table->users.size();
             for (idx = 0; idx < len; idx++) {
                 User_t *user = get_User(table, idx);
@@ -104,7 +102,7 @@ void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::s
             User_t *user = get_User(table, updateIdx[0]);
             user->id = id;
         } else if (field == "age") {
-            unsigned int age = atoi(data.c_str());
+            unsigned int age = std::stoi(data);
             size_t len = updateIdx.size();
             for (idx = 0; idx < len; idx++) {
                 User_t *user = get_User(table, updateIdx[idx]);
@@ -126,5 +124,4 @@ void where_update_handler(Command_t *cmd, size_t arg_idx, Table_t *table, std::s
         } 
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }

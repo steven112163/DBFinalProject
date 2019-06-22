@@ -120,7 +120,7 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     }
 
 
-    // TODO: Fix aggr, where, offset, limit after join
+    // TODO: Fix aggr, offset, limit after join
     if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user")) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
@@ -167,14 +167,12 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                     User_t *user = get_User(table, idx);
                     if (whereConditions.getResult(user))
                         targetIdx.push_back(idx);
-                }
-                else if (table->t1_type == 1) {
+                } else if (table->t1_type == 1) {
                     Like_t *like = get_Like(table, idx);
                     if (whereConditions.getResult(like))
                         targetIdx.push_back(idx);
-                }
-                else if (table->t1_type == 2) {
-                    // TO DO tuple
+                } else if (table->t1_type == 2) {
+                    // TODO: tuple
                 }
             }
 
@@ -188,16 +186,14 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                         cmd->cmd_args.sel_args.idxList.push_back(idx);
                         cmd->cmd_args.sel_args.idxListLen++;
                     }
-                }
-                else if (table->t1_type == 1) {
+                } else if (table->t1_type == 1) {
                     Like_t *like = get_Like(table, idx);
                     if (whereConditions.getResult(like)) {
                         cmd->cmd_args.sel_args.idxList.push_back(idx);
                         cmd->cmd_args.sel_args.idxListLen++;
                     }
-                }
-                else if (table->t1_type == 2) {
-                    // TO DO tuple
+                } else if (table->t1_type == 2) {
+                    // TODO tuple
                 }
             }
             if (cmd->cmd_args.sel_args.idxListLen == 0)
@@ -234,16 +230,14 @@ void get_aggregation_result(std::vector<size_t> targetIdx, Table_t *table) {
                         sum += user->id;
                     else
                         sum += user->age;
-                }
-                else if (table->t1_type == 1) {
+                } else if (table->t1_type == 1) {
                     Like_t *like = get_Like(table, targetIdx[idx]);
                     if (table->aggreFields[aggreIdx] == "id1")
                         sum += like->id1;
                     else
                         sum += like->id2;
-                }
-                else if (table->t1_type == 2) {
-                    // TO DO tuple
+                } else if (table->t1_type == 2) {
+                    // TODO tuple
                 }
             }
             if (table->aggreTypes[aggreIdx] == "sum")
@@ -256,7 +250,7 @@ void get_aggregation_result(std::vector<size_t> targetIdx, Table_t *table) {
 
 void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereConditions, Table_t *table) {
     if (arg_idx < cmd->args_len) {
-        cmd->cmd_args.sel_args.offset = atoi(cmd->args[arg_idx].c_str());
+        cmd->cmd_args.sel_args.offset = std::stoi(cmd->args[arg_idx]);
 
         arg_idx++;
 
@@ -265,14 +259,14 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *where
                 if (!table->aggreTypes.empty()) {
                     std::vector<size_t> targetIdx;
                     size_t idx, len;
-                    if (table->t1_type == 0)   
+                    if (table->t1_type == 0)
                         len = table->users.size();
                     else if (table->t1_type == 1)
                         len = table->likes.size();
                     else if (table->t1_type == 2) {
-                        // TO DO tuple
+                        // TODO tuple
                     }
-                         
+
                     for (idx = 0; idx < len; idx++)
                         targetIdx.push_back(idx);
                     get_aggregation_result(targetIdx, table);
@@ -290,7 +284,7 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *where
 
 void limit_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereConditions, Table_t *table) {
     if (arg_idx < cmd->args_len) {
-        cmd->cmd_args.sel_args.limit = atoi(cmd->args[arg_idx].c_str());
+        cmd->cmd_args.sel_args.limit = std::stoi(cmd->args[arg_idx]);
 
         arg_idx++;
 
@@ -299,12 +293,12 @@ void limit_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *whereC
                 if (!table->aggreTypes.empty()) {
                     std::vector<size_t> targetIdx;
                     size_t idx, len;
-                    if (table->t1_type == 0)   
+                    if (table->t1_type == 0)
                         len = table->users.size();
                     else if (table->t1_type == 1)
                         len = table->likes.size();
-                    else if (table->t1_type == 2) {
-                        // TO DO tuple
+                    else {
+                        len = table->joinTuples.size();
                     }
                     for (idx = 0; idx < len; idx++)
                         targetIdx.push_back(idx);

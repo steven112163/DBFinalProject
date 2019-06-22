@@ -7,8 +7,8 @@
 /// Return: ptr of InputBuffer_t
 ///
 InputBuffer_t* new_InputBuffer() {
-    InputBuffer_t *input_buffer = (InputBuffer_t*) malloc(sizeof(InputBuffer_t));
-    input_buffer->buffer = NULL;
+    auto *input_buffer = (InputBuffer_t *) malloc(sizeof(InputBuffer_t));
+    input_buffer->buffer = nullptr;
     input_buffer->buffer_len = 0;
     input_buffer->input_len = 0;
     return input_buffer;
@@ -41,7 +41,7 @@ void read_input(InputBuffer_t *input_buffer) {
 ///
 void clean_InputBuffer(InputBuffer_t *input_buffer) {
     free(input_buffer->buffer);
-    input_buffer->buffer = NULL;
+    input_buffer->buffer = nullptr;
     input_buffer->buffer_len = 0;
     input_buffer->input_len = 0;
 }

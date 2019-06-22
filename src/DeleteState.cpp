@@ -4,7 +4,7 @@
 #include "WhereConditions.h"
 
 void field_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    cmd->cmd_args.sel_args.fields = NULL;
+    cmd->cmd_args.sel_args.fields = nullptr;
     cmd->cmd_args.sel_args.fields_len = 0;
     cmd->cmd_args.sel_args.limit = -1;
     cmd->cmd_args.sel_args.offset = -1;
@@ -18,10 +18,8 @@ void field_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             cmd->type = UNRECOG_CMD;
             return;
         }
-        arg_idx += 1;
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
 void table_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
@@ -37,7 +35,6 @@ void table_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         }
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }
 
 void where_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
@@ -61,5 +58,4 @@ void where_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         } 
     }
     cmd->type = UNRECOG_CMD;
-    return;
 }

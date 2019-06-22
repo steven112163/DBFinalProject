@@ -4,7 +4,7 @@
 #include "Table.h"
 
 ///
-/// Allocate a Table_t struct, then initialize some attributes, and
+/// Allocate a Table_t structure, then initialize some attributes, and
 /// load table if the `file_name` is given
 ///
 Table_t *new_Table(char *file_name) {
@@ -66,7 +66,7 @@ int add_Like(Table_t *table, Like_t *like) {
 ///
 int archive_table(Table_t *table) {
     size_t archived_len;
-    struct stat st;
+    struct stat st{};
 
     if (table->fp == nullptr) {
         return 0;
@@ -95,7 +95,7 @@ int archive_table(Table_t *table) {
 ///
 int load_table(Table_t *table, char *file_name) {
     size_t archived_len;
-    struct stat st;
+    struct stat st{};
     if (table->fp != nullptr) {
         fclose(table->fp);
         free(table->file_name);
