@@ -126,7 +126,13 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         if (arg_idx == cmd->args_len) {
             if (!table->aggreTypes.empty()) {
                 std::vector<size_t> targetIdx;
-                size_t idx, len = table->users.size();
+                size_t idx, len;
+                if (table->t1_type == 0)
+                    len = table->users.size();
+                else if (table->t1_type == 1)
+                    len = table->likes.size();
+                else
+                    len = table->joinTuples.size();
                 for (idx = 0; idx < len; idx++)
                     targetIdx.push_back(idx);
                 get_aggregation_result(targetIdx, table);
