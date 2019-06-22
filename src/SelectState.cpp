@@ -3,7 +3,7 @@
 #include "SelectState.h"
 
 void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    cmd->cmd_args.sel_args.fields = NULL;
+    cmd->cmd_args.sel_args.fields = nullptr;
     cmd->cmd_args.sel_args.fields_len = 0;
     cmd->cmd_args.sel_args.limit = -1;
     cmd->cmd_args.sel_args.offset = -1;
@@ -13,7 +13,7 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     table->aggreFields.clear();
     table->aggreResults.clear();
     table->joinTuples.clear();
-    while(arg_idx < cmd->args_len) {
+    while (arg_idx < cmd->args_len) {
         std::string field;
         std::string type = check_aggregation(cmd->args[arg_idx], field);
         if (!type.empty()) {
@@ -34,7 +34,7 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         } else if (cmd->args[arg_idx] == "id2") {
             add_select_field(cmd, cmd->args[arg_idx].c_str());
         } else if (cmd->args[arg_idx] == "from") {
-            table_state_handler(cmd, arg_idx+1, table);
+            table_state_handler(cmd, arg_idx + 1, table);
             return;
         } else {
             cmd->type = UNRECOG_CMD;
@@ -45,32 +45,53 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     cmd->type = UNRECOG_CMD;
 }
 
-std::string check_aggregation(std::string aggregation, std::string& field) {
+std::string check_aggregation(const std::string &aggregation, std::string &field) {
     size_t aggreLoc = aggregation.find("avg");
     if (aggreLoc != std::string::npos) {
         field = aggregation.substr(aggreLoc + 4, aggregation.length() - 5);
         return "avg";
     }
-    
+
     aggreLoc = aggregation.find("count");
     if (aggreLoc != std::string::npos) {
         field = aggregation.substr(aggreLoc + 6, aggregation.length() - 7);
         return "count";
     }
-    
+
     aggreLoc = aggregation.find("sum");
     if (aggreLoc != std::string::npos) {
         field = aggregation.substr(aggreLoc + 4, aggregation.length() - 5);
         return "sum";
     }
-    
+
     field = "";
     return "";
 }
 
 void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user")) {
+//    // Join detection
+//    auto join_idx = 0;
+//    for (join_idx = 0; join_idx < cmd->args_len; join_idx++) {
+//        if (cmd->args[join_idx] == "join")
+//            break;
+//    }
+//    // Form join tuples
+//    if (join_idx > 0) {
+//        auto on_idx = 0;
+//        for (on_idx = 0; on_idx < cmd->args_len; on_idx++) {
+//            if (cmd->args[on_idx] == "on")
+//                break;
+//        }
+//
+//        // There will only be: id = id1 or id = id2
+//        // joined_field is the field flag of Table like.
+//        auto joined_field = 0;
+//        if (cmd->args[on_idx + 3] == "id1");
+//    }
 
+
+    // TODO: Fix aggr, where, offset, limit after join
+    if (arg_idx < cmd->args_len && (cmd->args[arg_idx] == "user")) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
             if (!table->aggreTypes.empty()) {
@@ -82,7 +103,7 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             }
             return;
         } else if (cmd->args[arg_idx] == "where") {
-            where_state_handler(cmd, arg_idx+1, table);
+            where_state_handler(cmd, arg_idx + 1, table);
             return;
         } else if (cmd->args[arg_idx] == "offset") {
             offset_state_handler(cmd, arg_idx + 1, nullptr, table);
@@ -102,7 +123,7 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             if (cmd->args[next_arg] == "offset" ||
                 cmd->args[next_arg] == "limit")
                 break;
-        
+
         std::vector<std::string> conditions;
         for (; arg_idx < next_arg; arg_idx++)
             conditions.push_back(cmd->args[arg_idx]);
@@ -116,7 +137,7 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                 if (whereConditions.getResult(user))
                     targetIdx.push_back(idx);
             }
-            
+
             get_aggregation_result(targetIdx, table);
         } else {
             size_t idx, len = table->users.size();
@@ -130,18 +151,18 @@ void where_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             if (cmd->cmd_args.sel_args.idxListLen == 0)
                 cmd->cmd_args.sel_args.idxListLen = 1;
         }
-        
+
         if (next_arg == cmd->args_len) {
             return;
         }
         if (next_arg < cmd->args_len && cmd->args[next_arg] == "offset") {
-            offset_state_handler(cmd, next_arg+1, &whereConditions, table);
+            offset_state_handler(cmd, next_arg + 1, &whereConditions, table);
             return;
         } else if (next_arg < cmd->args_len && cmd->args[next_arg] == "limit") {
-            limit_state_handler(cmd, next_arg+1, &whereConditions, table);
+            limit_state_handler(cmd, next_arg + 1, &whereConditions, table);
             return;
         }
-            
+
     }
     cmd->type = UNRECOG_CMD;
 }
@@ -164,7 +185,7 @@ void get_aggregation_result(std::vector<size_t> targetIdx, Table_t *table) {
             if (table->aggreTypes[aggreIdx] == "sum")
                 table->aggreResults.push_back(std::to_string(sum));
             else
-                table->aggreResults.push_back(std::to_string((double)sum / targetIdx.size()));
+                table->aggreResults.push_back(std::to_string((double) sum / targetIdx.size()));
         }
     }
 }
@@ -188,7 +209,7 @@ void offset_state_handler(Command_t *cmd, size_t arg_idx, WhereConditions *where
             return;
         } else if (arg_idx < cmd->args_len && cmd->args[arg_idx] == "limit") {
 
-            limit_state_handler(cmd, arg_idx+1, whereConditions, table);
+            limit_state_handler(cmd, arg_idx + 1, whereConditions, table);
             return;
         }
     }

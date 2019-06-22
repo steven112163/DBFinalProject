@@ -120,7 +120,7 @@ void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
             print_user(get_User(table, idxList[idx]), &(cmd->cmd_args.sel_args));
         }
     } else {
-        for (idx = offset; idx < table->len; idx++) {
+        for (idx = offset; idx < table->users.size(); idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
@@ -242,7 +242,7 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
     field_state_handler(cmd, 1, table);
     
     print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
-    return table->len;
+    return table->users.size();
 }
 
 ///
@@ -253,7 +253,7 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
 int handle_update_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = UPDATE_CMD;
     field_update_handler(cmd, 1, table);
-    return table->len;
+    return table->users.size();
 }
 
 ///
@@ -263,9 +263,9 @@ int handle_update_cmd(Table_t *table, Command_t *cmd) {
 ///
 int handle_delete_cmd(Table_t *table, Command_t *cmd) {
     cmd->type = DELETE_CMD;
-    size_t originalTableLen = table->len;
+    size_t originalTableLen = table->users.size();
     field_delete_handler(cmd, 1, table);
-    return originalTableLen - table->len;
+    return originalTableLen - table->users.size();
 }
 
 ///
