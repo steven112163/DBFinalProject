@@ -15,7 +15,6 @@ typedef struct Tuple {
 
 typedef struct Table {
     size_t capacity;
-    size_t len;
     std::vector<User_t> users;
     std::vector<Like_t> likes;
     unsigned char *cache_map;

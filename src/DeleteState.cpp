@@ -30,7 +30,6 @@ void table_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
             table->users.clear();
-            table->len = table->likes.size();
             return;
         } else if (cmd->args[arg_idx] == "where") {
             where_delete_handler(cmd, arg_idx+1, table);
@@ -54,7 +53,6 @@ void where_delete_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             if (whereConditions.getResult(user)) {
                 table->users.erase(table->users.begin() + idx);
                 idx--;
-                table->len--;
             }
         }
         
