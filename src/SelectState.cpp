@@ -3,7 +3,7 @@
 #include "SelectState.h"
 
 void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
-    cmd->cmd_args.sel_args.fields = NULL;
+    cmd->cmd_args.sel_args.fields = nullptr;
     cmd->cmd_args.sel_args.fields_len = 0;
     cmd->cmd_args.sel_args.limit = -1;
     cmd->cmd_args.sel_args.offset = -1;
@@ -45,7 +45,7 @@ void field_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
     cmd->type = UNRECOG_CMD;
 }
 
-std::string check_aggregation(std::string aggregation, std::string& field) {
+std::string check_aggregation(const std::string &aggregation, std::string &field) {
     size_t aggreLoc = aggregation.find("avg");
     if (aggreLoc != std::string::npos) {
         field = aggregation.substr(aggreLoc + 4, aggregation.length() - 5);

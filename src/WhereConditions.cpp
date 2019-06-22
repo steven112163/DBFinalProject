@@ -28,8 +28,8 @@ bool WhereConditions::getResult(User_t *user) {
     } else {
         firstResult = this->getPartialResult(user, this->firstField, this->firstData, this->firstOp);
     }
-    
-    if (this->secondField == "")
+
+    if (this->secondField.empty())
         return firstResult;
     
     bool secondResult;
@@ -46,7 +46,7 @@ bool WhereConditions::getResult(User_t *user) {
         return (firstResult && secondResult);
 }
 
-bool WhereConditions::getPartialResult(User_t *user, std::string field, double data, std::string op) {
+bool WhereConditions::getPartialResult(User_t *user, const std::string &field, double data, std::string op) {
     if (field == "id")
         return this->compare(user->id, data, op);
     else
