@@ -130,6 +130,56 @@ void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
 }
 
 ///
+/// Print the likes for given offset and limit restriction
+///
+void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
+    size_t idx;
+    int limit = cmd->cmd_args.sel_args.limit;
+    int offset = cmd->cmd_args.sel_args.offset;
+
+    if (offset == -1)
+        offset = 0;
+    
+    if (limit == -1 && table->aggreResults.size() > 0)
+        limit = 1;
+
+    if (table->aggreResults.size() > 0) {
+        if (offset == 0 && limit > 0) {
+            printf("(");
+            size_t idx;
+            for (idx = 0; idx < table->aggreResults.size(); idx++) {
+                if (idx > 0) printf(", ");
+                
+                if (table->aggreTypes[idx] == "avg") {
+                    double output = atof(table->aggreResults[idx].c_str());
+                    printf("%.3f", output);
+                } else {
+                    int output = atoi(table->aggreResults[idx].c_str());
+                    printf("%d", output);
+                }
+            }
+            printf(")\n");
+        }
+    } else if (idxList.empty() && idxListLen == 1) {
+        return;
+    } else if (idxListLen != 0) {
+        for (idx = offset; idx < idxListLen; idx++) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
+                break;
+            }
+            print_user(get_User(table, idxList[idx]), &(cmd->cmd_args.sel_args));
+        }
+    } else {
+        for (idx = offset; idx < table->users.size(); idx++) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
+                break;
+            }
+            print_user(get_User(table, idx), &(cmd->cmd_args.sel_args));
+        }
+    }
+}
+
+///
 /// This function received an output argument
 /// Return: category of the command
 ///
@@ -238,8 +288,8 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
     if (table->t1_type == 0) {
         print_users(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     }
-    else if (table->t1_type == 1) {
-
+    else if (table->t1_type == 1) { 
+        
     }
     else if (table->t1_type == 2) {
 
