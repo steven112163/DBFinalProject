@@ -11,6 +11,7 @@ State_t* new_State();
 void print_prompt(State_t *state);
 void print_user(User_t *user, SelectArgs_t *sel_args);
 void print_like(Like_t *like, SelectArgs_t *sel_args);
+void print_join(User_t *user, Like_t *like, SelectArgs_t *sel_args);
 void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd);
 void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd);
 void print_joins(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd);

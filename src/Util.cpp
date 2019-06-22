@@ -80,10 +80,39 @@ void print_like(Like_t *like, SelectArgs_t *sel_args) {
 }
 
 ///
+/// Print the join in the specific format
+///
+void print_join(User_t *user, Like_t *like, SelectArgs_t *sel_args) {
+    size_t idx;
+    printf("(");
+    for (idx = 0; idx < sel_args->fields_len; idx++) {
+        if (!strncmp(sel_args->fields[idx], "*", 1)) {
+            printf("%d, %s, %s, %d, %d, %d", user->id, user->name, user->email, user->age, like->id1, like->id2);
+        } else {
+            if (idx > 0) printf(", ");
+
+            if (!strncmp(sel_args->fields[idx], "id", 2)) {
+                printf("%d", user->id);
+            } else if (!strncmp(sel_args->fields[idx], "name", 4)) {
+                printf("%s", user->name);
+            } else if (!strncmp(sel_args->fields[idx], "email", 5)) {
+                printf("%s", user->email);
+            } else if (!strncmp(sel_args->fields[idx], "age", 3)) {
+                printf("%d", user->age);
+            } else if (!strncmp(sel_args->fields[idx], "id1", 3)) {
+                printf("%d", like->id1);
+            } else if (!strncmp(sel_args->fields[idx], "id2", 3)) {
+                printf("%d", like->id2);
+            }
+        }
+    }
+    printf(")\n");
+}
+
+///
 /// Print the users for given offset and limit restriction
 ///
 void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
-    size_t idx;
     int limit = cmd->cmd_args.sel_args.limit;
     int offset = cmd->cmd_args.sel_args.offset;
 
@@ -112,14 +141,14 @@ void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
     } else if (idxList.empty() && idxListLen == 1) {
         return;
     } else if (idxListLen != 0) {
-        for (idx = offset; idx < idxListLen; idx++) {
+        for (size_t idx = offset; idx < idxListLen; idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
             print_user(get_User(table, idxList[idx]), &(cmd->cmd_args.sel_args));
         }
     } else {
-        for (idx = offset; idx < table->users.size(); idx++) {
+        for (size_t idx = offset; idx < table->users.size(); idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
@@ -132,7 +161,6 @@ void print_users(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
 /// Print the likes for given offset and limit restriction
 ///
 void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
-    size_t idx;
     int limit = cmd->cmd_args.sel_args.limit;
     int offset = cmd->cmd_args.sel_args.offset;
     if (offset == -1)
@@ -144,8 +172,7 @@ void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
     if (table->aggreResults.size() > 0) {
         if (offset == 0 && limit > 0) {
             printf("(");
-            size_t idx;
-            for (idx = 0; idx < table->aggreResults.size(); idx++) {
+            for (size_t idx = 0; idx < table->aggreResults.size(); idx++) {
                 if (idx > 0) printf(", ");
                 
                 if (table->aggreTypes[idx] == "avg") {
@@ -161,14 +188,14 @@ void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
     } else if (idxList.empty() && idxListLen == 1) {
         return;
     } else if (idxListLen != 0) {
-        for (idx = offset; idx < idxListLen; idx++) {
+        for (size_t idx = offset; idx < idxListLen; idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
             print_like(get_Like(table, idxList[idx]), &(cmd->cmd_args.sel_args));
         }
     } else {
-        for (idx = offset; idx < table->likes.size(); idx++) {
+        for (size_t idx = offset; idx < table->likes.size(); idx++) {
             if (limit != -1 && ((int)idx - offset) >= limit) {
                 break;
             }
@@ -181,7 +208,51 @@ void print_likes(Table_t *table, std::vector<size_t> idxList, size_t idxListLen,
 /// Print the join for given offset and limit restriction
 ///
 void print_joins(Table_t *table, std::vector<size_t> idxList, size_t idxListLen, Command_t *cmd) {
+    int limit = cmd->cmd_args.sel_args.limit;
+    int offset = cmd->cmd_args.sel_args.offset;
+    if (offset == -1)
+        offset = 0;
     
+    if (limit == -1 && table->aggreResults.size() > 0)
+        limit = 1;
+    
+    if (table->aggreResults.size() > 0) {
+        if (offset == 0 && limit > 0) {
+            printf("(");
+            for (size_t idx = 0; idx < table->aggreResults.size(); idx++) {
+                if (idx > 0) printf(", ");
+                
+                if (table->aggreTypes[idx] == "avg") {
+                    double output = atof(table->aggreResults[idx].c_str());
+                    printf("%.3f", output);
+                } else {
+                    int output = atoi(table->aggreResults[idx].c_str());
+                    printf("%d", output);
+                }
+            }
+            printf(")\n");
+        }
+    } else if (idxList.empty() && idxListLen == 1) {
+        return;
+    } else if (idxListLen != 0) {
+        for (size_t idx = offset; idx < idxListLen; idx++) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
+                break;
+            }
+            print_join(get_User(table, table->joinTuples[idxList[idx]].userIndex),
+                       get_Like(table, table->joinTuples[idxList[idx]].likeIndex),
+                       &(cmd->cmd_args.sel_args));
+        }
+    } else {
+        for (size_t idx = offset; idx < table->joinTuples.size(); idx++) {
+            if (limit != -1 && ((int)idx - offset) >= limit) {
+                break;
+            }
+            print_join(get_User(table, table->joinTuples[idx].userIndex),
+                       get_Like(table, table->joinTuples[idx].likeIndex),
+                       &(cmd->cmd_args.sel_args));
+        }
+    }
 }
 
 ///
@@ -296,7 +367,7 @@ int handle_select_cmd(Table_t *table, Command_t *cmd) {
         print_likes(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     }
     else if (table->t1_type == 2) {
-        print_joins(table, cmd->cmd-args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
+        print_joins(table, cmd->cmd_args.sel_args.idxList, cmd->cmd_args.sel_args.idxListLen, cmd);
     }
     return table->users.size();
 }

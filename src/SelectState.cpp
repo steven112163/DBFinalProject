@@ -116,11 +116,10 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
                 }
             }
         }
-        arg_idx = on_idx + 4;
+        arg_idx = on_idx + 3;
     }
 
 
-    // TODO: Fix aggr, offset, limit after join
     if (arg_idx < cmd->args_len) {
         arg_idx++;
         if (arg_idx == cmd->args_len) {
@@ -148,8 +147,6 @@ void table_state_handler(Command_t *cmd, size_t arg_idx, Table_t *table) {
             limit_state_handler(cmd, arg_idx + 1, nullptr, table);
             return;
         }
-    } else {
-        // TODO: Command is finished
     }
     cmd->type = UNRECOG_CMD;
 }
