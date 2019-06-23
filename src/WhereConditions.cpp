@@ -25,7 +25,7 @@ WhereConditions::WhereConditions(std::vector<std::string> conditions) {
 bool WhereConditions::getResult(User_t *user) {
     bool firstResult;
     if (this->firstField == "id" || this->firstField == "age") {
-        double data = stod(this->firstData);
+        double data = strtod(this->firstData.c_str(), nullptr);
         firstResult = WhereConditions::getPartialResult(user, this->firstField, data, this->firstOp);
     } else {
         firstResult = getPartialResult(user, this->firstField, this->firstData, this->firstOp);
@@ -36,7 +36,7 @@ bool WhereConditions::getResult(User_t *user) {
 
     bool secondResult;
     if (this->secondField == "id" || this->secondField == "age") {
-        double data = stod(this->secondData);
+        double data = strtod(this->secondData.c_str(), nullptr);
         secondResult = WhereConditions::getPartialResult(user, this->secondField, data, this->secondOp);
     } else {
         secondResult = getPartialResult(user, this->secondField, this->secondData, this->secondOp);
@@ -53,7 +53,7 @@ bool WhereConditions::getResult(User_t *user) {
 bool WhereConditions::getResult(Like_t *like) {
     bool firstResult = false;
     if (this->firstField == "id1" || this->firstField == "id2") {
-        double data = stod(this->firstData);
+        double data = strtod(this->firstData.c_str(), nullptr);
         firstResult = getPartialResult(like, this->firstField, data, this->firstOp);
     }
 
@@ -62,7 +62,7 @@ bool WhereConditions::getResult(Like_t *like) {
 
     bool secondResult = false;
     if (this->secondField == "id1" || this->secondField == "id2") {
-        double data = stod(this->secondData);
+        double data = strtod(this->secondData.c_str(), nullptr);
         secondResult = getPartialResult(like, this->secondField, data, this->secondOp);
     }
 
@@ -79,14 +79,14 @@ bool WhereConditions::getResult(Tuple &tuple, Table_t &table) {
         this->firstField == "email" || this->firstField == "age") {
         User_t *user = &table.users[tuple.userIndex];
         if (this->firstField == "id" || this->firstField == "age") {
-            double data = stod(this->firstData);
+            double data = strtod(this->firstData.c_str(), nullptr);
             firstResult = getPartialResult(user, this->firstField, data, this->firstOp);
         } else {
             firstResult = getPartialResult(user, this->firstField, this->firstData, this->firstOp);
         }
     } else {
         Like_t *id = &table.likes[tuple.likeIndex];
-        double data = stod(this->firstData);
+        double data = strtod(this->firstData.c_str(), nullptr);
         firstResult = getPartialResult(id, this->firstField, data, this->firstOp);
     }
 
@@ -101,7 +101,7 @@ bool WhereConditions::getResult(Tuple &tuple, Table_t &table) {
 
         User_t *user = &table.users[tuple.userIndex];
         if (this->secondField == "id" || this->secondField == "age") {
-            double data = stod(this->secondData);
+            double data = strtod(this->secondData.c_str(), nullptr);
             secondResult = getPartialResult(user, this->secondField, data, this->secondOp);
         } else {
             secondResult = getPartialResult(user, this->secondField, this->secondData, this->secondOp);
@@ -110,7 +110,7 @@ bool WhereConditions::getResult(Tuple &tuple, Table_t &table) {
     } else {
 
         Like_t *id = &table.likes[tuple.likeIndex];
-        double data = stod(this->firstData);
+        double data = strtod(this->firstData.c_str(), nullptr);
         secondResult = getPartialResult(id, this->firstField, data, this->firstOp);
 
     }

@@ -53,7 +53,6 @@ int add_select_field(Command_t *cmd, const char *argument) {
 /// Free the allocated arguments, but without free the argument buffer
 ///
 void cleanup_Command(Command_t *cmd) {
-    size_t idx;
     cmd->args.clear();
     cmd->cmd_args.sel_args.idxList.clear();
     cmd->cmd_args.sel_args.idxListLen = 0;

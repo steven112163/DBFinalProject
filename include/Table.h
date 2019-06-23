@@ -20,12 +20,12 @@ public:
 };
 
 typedef struct Table {
-    size_t capacity;
+    //size_t capacity;
+    //unsigned char *cache_map;
+    //FILE *fp;
+    //char *file_name;
     std::vector<User_t> users;
     std::vector<Like_t> likes;
-    unsigned char *cache_map;
-    FILE *fp;
-    char *file_name;
     std::vector<std::string> aggreTypes;
     std::vector<std::string> aggreFields;
     std::vector<std::string> aggreResults;
@@ -36,8 +36,9 @@ typedef struct Table {
 Table_t *new_Table(char *file_name);
 int add_User(Table_t *table, User_t *user);
 int add_Like(Table_t *table, Like_t *like);
-int archive_table(Table_t *table);
-int load_table(Table_t *table, char *file_name);
+
+//int archive_table(Table_t *table);
+//int load_table(Table_t *table, char *file_name);
 User_t* get_User(Table_t *table, size_t idx);
 Like_t* get_Like(Table_t *table, size_t idx);
 

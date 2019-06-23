@@ -6,41 +6,28 @@
 /// Allocate InputBuffer_t and initialize some attributes
 /// Return: ptr of InputBuffer_t
 ///
-InputBuffer_t* new_InputBuffer() {
-    auto *input_buffer = (InputBuffer_t *) malloc(sizeof(InputBuffer_t));
-    input_buffer->buffer = nullptr;
-    input_buffer->buffer_len = 0;
-    input_buffer->input_len = 0;
-    return input_buffer;
-}
+//InputBuffer_t* new_InputBuffer() {
+//    auto *input_buffer = (InputBuffer_t *) malloc(sizeof(InputBuffer_t));
+//    input_buffer->buffer = nullptr;
+//    input_buffer->buffer_len = 0;
+//    input_buffer->input_len = 0;
+//    return input_buffer;
+//}
 
 ///
 /// Read the input from stdin, then store into InputBuffer_t
 ///
-void read_input(InputBuffer_t *input_buffer) {
-    ssize_t bytes_read = getline(&(input_buffer->buffer), &(input_buffer->buffer_len), stdin);
-    ssize_t input_len;
-
-    if (bytes_read <= 0) {
-        printf("Error reading input\n");
-        exit(1);
-    }
-
-    input_len = bytes_read;
-    while (input_buffer->buffer[input_len - 1] == '\n'
-            || input_buffer->buffer[input_len - 1] == '\r') {
-        input_buffer->buffer[input_len - 1] = '\0';
-        input_len--;
-    }
-    input_buffer->input_len = input_len;
+void read_input(char *input_buffer) {
+    size_t bufsize = 200;
+    getline(&input_buffer, &bufsize, stdin);
 }
 
 ///
 /// Free the allocated buffer to store input string
 ///
-void clean_InputBuffer(InputBuffer_t *input_buffer) {
-    free(input_buffer->buffer);
-    input_buffer->buffer = nullptr;
-    input_buffer->buffer_len = 0;
-    input_buffer->input_len = 0;
-}
+//void clean_InputBuffer(InputBuffer_t *input_buffer) {
+//    free(input_buffer->buffer);
+//    input_buffer->buffer = nullptr;
+//    input_buffer->buffer_len = 0;
+//    input_buffer->input_len = 0;
+//}

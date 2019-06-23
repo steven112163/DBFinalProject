@@ -281,7 +281,7 @@ int parse_input(char *input, Command_t *cmd) {
 ///
 void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
     if (cmd->args[0] == ".exit") {
-        archive_table(table);
+        //archive_table(table);
         exit(0);
     } else if (cmd->args[0] == ".output") {
         if (cmd->args_len == 2) {
@@ -300,8 +300,8 @@ void handle_builtin_cmd(Table_t *table, Command_t *cmd, State_t *state) {
         }
     } else if (cmd->args[0] == ".load") {
         if (cmd->args_len == 2) {
-            char* filename = (char*) cmd->args[1].c_str();
-            load_table(table, filename);
+            //char* filename = (char*) cmd->args[1].c_str();
+            //load_table(table, filename);
         }
     } else if (cmd->args[0] == ".help") {
         print_help_msg();
